@@ -1,0 +1,39 @@
+/* Subtle theme variants — flat colors, no loud gradients or animations */
+
+body.sunrise {
+  --bg: #fffdf7;
+  --surface: #ffffff;
+  --accent: #f97316;
+}
+
+body.midnight, body.dark {
+  --bg: #020617;
+  --surface: #0f172a;
+  --text-main: #e5e7eb;
+  --border: #1e293b;
+  --accent: #38bdf8;
+}
+
+body.ocean {
+  --bg: #f1fbff;
+  --accent: #0284c7;
+}
+
+body.zen {
+  --bg: #fbfffb;
+  --accent: #059669;
+}
+
+body.power {
+  --bg: #fff7f7;
+  --accent: #dc2626;
+}
+
+body.mono {
+  --bg: #0f172a;
+  --surface: #020617;
+  --text-main: #f8fafc;
+  --accent: #94a3b8;
+}
+
+/* Keep themes subtle — no animations here */

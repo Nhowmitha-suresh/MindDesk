@@ -1,0 +1,56 @@
+/* Clean, neutral base styles tuned for a professional dashboard */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --accent: #2563eb;
+  --radius: 10px;
+  --gap: 16px;
+  --transition: 180ms ease;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+h1, h2, h3 { font-weight: 600; color: var(--text-main); }
+
+p { color: var(--text-muted); line-height: 1.6; }
+
+.hidden { display: none; }
+
+.app { display: flex; height: 100vh; }
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+/* Buttons */
+button { border: 1px solid transparent; padding: 8px 12px; border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer; }
+button.secondary { background: transparent; color: var(--text-muted); }
+
+input, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-top: 8px; }
+
+.muted { color: var(--text-muted); }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+/* Minimal transitions */
+* { transition: background var(--transition), color var(--transition), border-color var(--transition); }

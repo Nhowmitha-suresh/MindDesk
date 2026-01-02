@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MindDesk Pro</title>
+
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/themes.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <h2 class="logo">MindDesk</h2>
+
+    <nav>
+      <a onclick="showSection('home')" data-target="home">Dashboard</a>
+      <a onclick="showSection('personality')" data-target="personality">Personality</a>
+      <a onclick="showSection('insights')" data-target="insights">Insights</a>
+      <a onclick="showSection('themes')" data-target="themes">Appearance</a>
+    </nav>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button id="collapseBtn" aria-expanded="true">Collapse</button>
+      <button id="themeToggle" aria-pressed="false">Toggle theme</button>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+      <div>
+        <h1 id="greeting"></h1>
+        <p class="subtitle">Your personalized productivity overview</p>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px;">
+        <input id="globalSearch" placeholder="Search dashboard..." aria-label="Search dashboard" />
+        <button id="openProfile">Profile</button>
+      </div>
+    </header>
+
+    <section id="home" class="section">
+      <div class="grid">
+        <div class="card">
+          <h3>Personality Type</h3>
+          <p>Analytical – Creative</p>
+        </div>
+
+        <div class="card">
+          <h3>Dominant Trait</h3>
+          <p>Logical Reasoning</p>
+        </div>
+
+        <div class="card">
+          <h3>Focus Style</h3>
+          <p>Deep, long sessions</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="personality" class="section hidden">
+      <h2>Personality Analysis</h2>
+      <div id="questionBox"></div>
+    </section>
+
+    <section id="insights" class="section hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h2>Insights</h2>
+        <div>
+          <button id="exportCsv">Export CSV</button>
+          <button id="exportJson">Export JSON</button>
+          <button id="importBtn">Import CSV</button>
+          <input id="importCsv" type="file" accept=".csv" style="display:none" />
+        </div>
+      </div>
+      <div id="chartControls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:8px;">Chart
+          <select id="chartType">
+            <option value="radar">Radar</option>
+            <option value="bar">Bar</option>
+            <option value="line">Line</option>
+          </select>
+        </label>
+
+        <label style="display:flex;align-items:center;gap:8px;">Compare
+          <input type="checkbox" id="compareToggle" />
+        </label>
+
+        <div id="timeFilters" style="display:flex;gap:6px;">
+          <button data-range="today" class="time-filter">Today</button>
+          <button data-range="week" class="time-filter">Week</button>
+          <button data-range="month" class="time-filter">Month</button>
+          <button data-range="all" class="time-filter active">All</button>
+        </div>
+
+        <div id="traitToggles" style="display:flex;gap:8px;flex-wrap:wrap;margin-left:8px;"></div>
+      </div>
+
+      <canvas id="traitChart"></canvas>
+    </section>
+
+    <section id="themes" class="section hidden">
+      <h2>Appearance</h2>
+      <div class="theme-grid">
+        <button onclick="setTheme('sunrise')">Sunrise</button>
+        <button onclick="setTheme('midnight')">Midnight</button>
+        <button onclick="setTheme('ocean')">Ocean</button>
+        <button onclick="setTheme('zen')">Zen</button>
+        <button onclick="setTheme('power')">Power</button>
+        <button onclick="setTheme('mono')">Mono</button>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+    <div class="modal-content">
+      <h3 id="profileTitle">Profile Settings</h3>
+      <label>Name</label>
+      <input id="profileName" placeholder="Your display name" />
+
+      <label>Avatar URL (optional)</label>
+      <input id="profileAvatar" placeholder="https://..." />
+
+      <div class="modal-actions">
+        <button id="saveProfile">Save</button>
+        <button id="cancelProfile">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding / First-run hints -->
+  <div id="onboarding" class="onboarding hidden" aria-hidden="true">
+    <div class="onboarding-step" data-step="1">
+      <h4>Welcome to MindDesk</h4>
+      <p>Use the left navigation to explore Dashboard, Personality, and Insights.</p>
+      <div class="onboarding-actions">
+        <button id="onboardingNext">Next</button>
+        <button id="onboardingSkip">Skip</button>
+      </div>
+    </div>
+  </div>
+
+<script src="js/navigation.js"></script>
+<script src="js/personality.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/personalization.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

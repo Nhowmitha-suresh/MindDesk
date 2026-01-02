@@ -2,96 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>MindDesk</title>
-  <link rel="stylesheet" href="style.css">
+  <title>MindDesk Pro | Login</title>
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/base.css">
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen" class="login">
-  <h1>🧠 MindDesk</h1>
-  <p>Your productivity dashboard</p>
-  <input id="loginUser" placeholder="Username">
-  <input id="loginPass" type="password" placeholder="Password">
-  <button onclick="login()">Login / Register</button>
+<div class="login-container">
+  <div class="login-card">
+    <h1>MindDesk Pro</h1>
+    <p class="tagline">Personalized Productivity Intelligence</p>
+
+    <label>Name</label>
+    <input id="username" placeholder="Enter your name">
+
+    <label>Password</label>
+    <input id="password" type="password" placeholder="••••••••">
+
+    <button onclick="login()">Login</button>
+
+    <p class="hint">Demo login • No signup required</p>
+  </div>
 </div>
 
-<!-- APP -->
-<div id="appScreen" class="app hidden">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <h2>🧠 MindDesk</h2>
-    <p id="welcomeText"></p>
-
-    <button onclick="show('dashboard')">🏠 Dashboard</button>
-    <button onclick="show('notes')">📝 Notes</button>
-    <button onclick="show('tasks')">✅ Tasks</button>
-    <button onclick="show('focus')">🎯 Focus</button>
-    <button onclick="show('utils')">🔧 Utilities</button>
-    <button onclick="show('ai')">🤖 AI</button>
-
-    <select onchange="setTheme(this.value)">
-      <option value="">🌤 Light</option>
-      <option value="dark">🌙 Dark</option>
-    </select>
-
-    <button class="logout" onclick="logout()">Logout</button>
-  </aside>
-
-  <!-- CONTENT -->
-  <main class="content">
-
-    <section id="dashboard" class="section">
-      <h1>🏠 Dashboard</h1>
-      <p>All your tools are available from the left menu.</p>
-    </section>
-
-    <section id="notes" class="section hidden">
-      <h1>📝 Notes</h1>
-      <textarea id="notesArea" placeholder="Write notes..."></textarea>
-    </section>
-
-    <section id="tasks" class="section hidden">
-      <h1>✅ Tasks</h1>
-      <input id="taskInput" placeholder="New task">
-      <button onclick="addTask()">Add</button>
-      <ul id="taskList"></ul>
-    </section>
-
-    <section id="focus" class="section hidden">
-      <h1>🎯 Focus Timer</h1>
-      <button onclick="startTimer()">Start 25 min</button>
-      <p id="timer"></p>
-    </section>
-
-    <section id="utils" class="section hidden">
-      <h1>🔧 Utilities</h1>
-
-      <h3>🔐 Password Strength</h3>
-      <input type="password" id="password" onkeyup="checkPassword()">
-      <p id="passwordResult"></p>
-
-      <h3>📊 BMI Calculator</h3>
-      <input id="height" placeholder="Height (cm)">
-      <input id="weight" placeholder="Weight (kg)">
-      <button onclick="calcBMI()">Calculate</button>
-      <p id="bmiResult"></p>
-    </section>
-
-    <section id="ai" class="section hidden">
-      <h1>🤖 AI Assistant</h1>
-      <input id="aiInput" placeholder="Ask something...">
-      <button onclick="askAI()">Ask AI</button>
-      <pre id="aiOutput"></pre>
-    </section>
-
-  </main>
-</div>
-
-<script src="utils/storage.js"></script>
-<script src="services/ollama.js"></script>
-<script src="app.js"></script>
-
+<script src="js/auth.js"></script>
 </body>
 </html>
