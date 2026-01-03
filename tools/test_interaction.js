@@ -99,6 +99,66 @@ const puppeteer = require('puppeteer');
   const dims = await page.$eval('#compareHistoryChart', c => ({ w: c.clientWidth, h: c.clientHeight } )).catch(()=>null);
   console.log('compare canvas dims:', dims);
 
+  // Now exercise Games UI
+  await page.click('button[data-target="games"]');
+  await page.waitForSelector('#gameArea', { timeout: 5000 });
+
+  // Suspicious Button (activate tab first)
+  await page.click('.game-tab[data-game="suspicious"]').catch(()=>{});
+  await page.waitForSelector('#suspiciousBtn');
+  await page.click('#suspiciousBtn').catch(()=>{});
+  const susp = await page.$eval('#suspiciousResult', el => el.textContent).catch(()=>null);
+  console.log('suspicious result:', susp);
+  await page.click('#suspiciousNext').catch(()=>{});
+
+  // Random Pick (activate tab first)
+  await page.click('.game-tab[data-game="randompick"]').catch(()=>{});
+  await page.waitForSelector('.pick-img[data-pick="owl"]');
+  await page.click('.pick-img[data-pick="owl"]').catch(()=>{});
+  const pick = await page.$eval('#randompickResult', el => el.textContent).catch(()=>null);
+  console.log('pick result:', pick);
+  await page.click('#randompickNext').catch(()=>{});
+
+  // Annoying Situation (activate tab first)
+  await page.click('.game-tab[data-game="annoy"]').catch(()=>{});
+  await page.waitForSelector('.annoy-choice[data-choice="callout"]');
+  await page.click('.annoy-choice[data-choice="callout"]').catch(()=>{});
+  const annoy = await page.$eval('#annoyResult', el => el.textContent).catch(()=>null);
+  console.log('annoy result:', annoy);
+  await page.click('#annoyNext').catch(()=>{});
+
+  // What Would You Do (activate tab first)
+  await page.click('.game-tab[data-game="wwd"]').catch(()=>{});
+  await page.waitForSelector('.wwd-choice[data-choice="ask"]');
+  await page.click('.wwd-choice[data-choice="ask"]').catch(()=>{});
+  const wwd = await page.$eval('#wwdResult', el => el.textContent).catch(()=>null);
+  console.log('wwd result:', wwd);
+  await page.click('#wwdNext').catch(()=>{});
+
+  // Quick Math: read question, compute, submit
+  await page.click('.game-tab[data-game="quickmath"]').catch(()=>{});
+  await page.waitForSelector('#mathQuestion');
+  const q = await page.$eval('#mathQuestion', el => el.textContent).catch(()=>null);
+  console.log('math question:', q);
+  let computed = null;
+  if (q) {
+    const m = q.match(/What is (\d+) \+ (\d+)\?/);
+    if (m) computed = Number(m[1]) + Number(m[2]);
+  }
+  if (computed !== null) {
+    await page.type('#mathAnswer', String(computed));
+    await page.click('#mathSubmit');
+    const mathRes = await page.$eval('#mathResult', el => el.textContent).catch(()=>null);
+    console.log('math result:', mathRes);
+  }
+
+  // Memory: start and ensure result text changes to watching
+  await page.click('.game-tab[data-game="memory"]').catch(()=>{});
+  await page.waitForSelector('#memStart');
+  await page.click('#memStart').catch(()=>{});
+  const memText = await page.$eval('#memResult', el => el.textContent).catch(()=>null);
+  console.log('memory result after start:', memText);
+
   const ok = !!scores && dims && dims.w > 0;
   await browser.close();
   process.exit(ok ? 0 : 4);

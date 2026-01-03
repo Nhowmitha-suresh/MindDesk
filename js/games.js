@@ -70,17 +70,21 @@
     const colors = ['#f59e0b','#60a5fa','#34d399','#f472b6'];
     const seq = [];
     let playerTurn = false;
+    let playerPos = 0;
 
     function renderTiles() {
       tilesWrap.innerHTML = '';
       colors.forEach((c,i)=>{
         const t = document.createElement('div');
-        t.style.width = '64px'; t.style.height = '64px'; t.style.borderRadius='8px';
-        t.style.background = '#eee'; t.style.display='flex'; t.style.alignItems='center'; t.style.justifyContent='center';
-        t.style.cursor='pointer'; t.dataset.idx = i;
+        t.className = 'mem-tile';
+        t.dataset.idx = i;
+        t.setAttribute('role','button');
+        t.setAttribute('aria-label', `Tile ${i+1}`);
+        t.style.background = '#eee';
         t.addEventListener('click', onTileClick);
         tilesWrap.appendChild(t);
       });
+      updateIndicators(0);
     }
 
     function flashTile(i, dur=600) {
@@ -88,18 +92,42 @@
       if (!tile) return Promise.resolve();
       return new Promise(res=>{
         const orig = tile.style.background;
+        tile.classList.add('flash','pulse');
         tile.style.background = colors[i];
-        setTimeout(()=>{ tile.style.background = orig; res(); }, dur);
+        setTimeout(()=>{
+          tile.style.background = orig;
+          tile.classList.remove('flash');
+          // leave pulse removed after short delay
+          setTimeout(()=> tile.classList.remove('pulse'), 220);
+          res();
+        }, dur);
       });
+    }
+
+    function updateIndicators(len) {
+      const ind = document.getElementById('memIndicators');
+      if (!ind) return;
+      ind.innerHTML = '';
+      for (let i=0;i<len;i++){
+        const d = document.createElement('div'); d.className = 'dot'; d.dataset.pos = i;
+        ind.appendChild(d);
+      }
     }
 
     async function playSequence() {
       playerTurn = false;
+      playerPos = 0;
       result.textContent = 'Watch the sequence...';
+      tilesWrap.classList.add('playing');
+      updateIndicators(seq.length);
       for (let i=0;i<seq.length;i++){
         await flashTile(seq[i], 600);
+        // highlight current indicator while showing
+        const ind = document.querySelector(`#memIndicators .dot[data-pos='${i}']`);
+        if (ind) { ind.classList.add('active'); setTimeout(()=>ind.classList.remove('active'), 620); }
         await new Promise(r=>setTimeout(r,180));
       }
+      tilesWrap.classList.remove('playing');
       playerTurn = true;
       result.textContent = 'Your turn: repeat the sequence.';
     }
@@ -107,22 +135,30 @@
     function onTileClick(e){
       if (!playerTurn) return;
       const idx = Number(e.currentTarget.dataset.idx);
-      // play quick flash
+      // play quick flash (non-blocking)
       flashTile(idx,200);
-      const expected = seq.shift();
+      const expected = seq[playerPos];
       if (expected !== idx) {
         result.textContent = 'Incorrect — sequence ended.';
         playerTurn = false;
-        seq.length = 0;
+        // mark indicators as reset
+        updateIndicators(0);
+        seq.length = 0; playerPos = 0;
         return;
       }
-      if (seq.length === 0) {
+      // mark this dot as complete
+      const dot = document.querySelector(`#memIndicators .dot[data-pos='${playerPos}']`);
+      if (dot) dot.classList.add('complete');
+      playerPos += 1;
+      if (playerPos >= seq.length) {
         result.textContent = 'Correct! Next round.';
+        playerTurn = false;
+        playerPos = 0;
         // record success
         try {
           const key = 'minddesk_game_memory';
           const arr = JSON.parse(localStorage.getItem(key) || '[]');
-          arr.push({ ts: new Date().toISOString(), success: true });
+          arr.push({ ts: new Date().toISOString(), success: true, length: seq.length });
           localStorage.setItem(key, JSON.stringify(arr));
         } catch(e){}
         // start next round after small delay
@@ -134,15 +170,12 @@
       // push a random tile to sequence and play
       const idx = Math.floor(Math.random()*colors.length);
       seq.push(idx);
-      // clone seq for checking in onTileClick
-      const seqClone = seq.slice();
-      // replace seq with clone for player's checking
-      seq.length = 0; seq.push(...seqClone);
+      updateIndicators(seq.length);
       playSequence();
     }
 
     startBtn.addEventListener('click', ()=>{
-      seq.length = 0; nextRound();
+      seq.length = 0; playerPos = 0; nextRound();
     });
 
     // Next button forces the next round when ready
@@ -150,7 +183,7 @@
     if (memNextBtn) memNextBtn.addEventListener('click', ()=> { if (!playerTurn) { nextRound(); } });
 
     resetBtn.addEventListener('click', ()=>{
-      seq.length = 0; playerTurn=false; result.textContent='';
+      seq.length = 0; playerTurn=false; playerPos=0; result.textContent='';
     });
 
     renderTiles();

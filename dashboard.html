@@ -243,7 +243,10 @@
           <div id="game_memory" class="game-screen" style="display:none">
             <h3>Memory Sequence</h3>
             <p class="subtitle">Watch the pattern, then repeat it exactly. Each round grows by one step.</p>
-            <div id="memTiles" style="display:flex;gap:8px;margin-top:10px"></div>
+            <div id="memWrapper" style="margin-top:10px">
+              <div id="memTiles" class="mem-tiles" style="display:flex;gap:8px;"></div>
+              <div id="memIndicators" class="mem-indicators" aria-hidden="true" style="margin-top:8px;display:flex;gap:6px;align-items:center"></div>
+            </div>
             <div style="margin-top:10px">
               <button id="memStart" class="primary-btn">Start</button>
               <button id="memNext" class="secondary">Next</button>
