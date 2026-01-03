@@ -1,0 +1,23 @@
+{
+  "name": "minddesk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nhowmitha-suresh/MindDesk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nhowmitha-suresh/MindDesk/issues"
+  },
+  "homepage": "https://github.com/Nhowmitha-suresh/MindDesk#readme",
+  "dependencies": {
+    "puppeteer": "^24.34.0"
+  }
+}

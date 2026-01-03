@@ -1,0 +1,365 @@
+/* =========================================================
+   MINDDESK – LAYOUT STYLES
+   Structural layout system for analytics dashboards
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   APP SHELL
+---------------------------------------------------------- */
+.app {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------
+   SIDEBAR + CONTENT WRAPPER
+---------------------------------------------------------- */
+.sidebar {
+  flex-shrink: 0;
+  width: 220px;
+  background: var(--surface);
+  padding: 18px;
+  border-right: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar .brand {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.sidebar .nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar .nav-item {
+  background: transparent;
+  color: var(--accent);
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar .nav-item:hover {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.sidebar .nav-item.active {
+  background: var(--accent);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.logout-btn {
+  margin-top: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.content {
+  flex: 1;
+  min-width: 0; /* IMPORTANT for charts */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------
+   CONTENT SECTIONS STACKING
+---------------------------------------------------------- */
+.content > .section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ---------------------------------------------------------
+   PAGE PADDING SYSTEM
+---------------------------------------------------------- */
+.page-padding {
+  padding: 24px;
+}
+
+.page-padding-sm {
+  padding: 16px;
+}
+
+.page-padding-lg {
+  padding: 32px;
+}
+
+/* ---------------------------------------------------------
+   GRID SYSTEM (FLEXIBLE)
+---------------------------------------------------------- */
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+
+/* Column spans */
+.col-1  { grid-column: span 1; }
+.col-2  { grid-column: span 2; }
+.col-3  { grid-column: span 3; }
+.col-4  { grid-column: span 4; }
+.col-5  { grid-column: span 5; }
+.col-6  { grid-column: span 6; }
+.col-7  { grid-column: span 7; }
+.col-8  { grid-column: span 8; }
+.col-9  { grid-column: span 9; }
+.col-10 { grid-column: span 10; }
+.col-11 { grid-column: span 11; }
+.col-12 { grid-column: span 12; }
+
+/* ---------------------------------------------------------
+   COMMON DASHBOARD GRIDS
+---------------------------------------------------------- */
+.grid-kpi {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.grid-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.grid-equal {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+/* ---------------------------------------------------------
+   FLOW LAYOUTS
+---------------------------------------------------------- */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inline-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ---------------------------------------------------------
+   CARD CONTAINMENT RULES
+---------------------------------------------------------- */
+.card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.card-scroll {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+/* ---------------------------------------------------------
+   CHART LAYOUT RULES
+---------------------------------------------------------- */
+.chart-wrapper {
+  width: 100%;
+  height: 320px;
+  position: relative;
+}
+
+.chart-wrapper-lg {
+  height: 420px;
+}
+
+.chart-wrapper-sm {
+  height: 240px;
+}
+
+/* Prevent chart overflow */
+.chart-wrapper canvas {
+  max-width: 100% !important;
+}
+
+/* ---------------------------------------------------------
+   TABLE LAYOUT
+---------------------------------------------------------- */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrapper table {
+  min-width: 600px;
+}
+
+/* ---------------------------------------------------------
+   FORM LAYOUT
+---------------------------------------------------------- */
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-full {
+  grid-column: span 2;
+}
+
+/* ---------------------------------------------------------
+   MODAL LAYOUT
+---------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 480px;
+  max-width: 90%;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+/* ---------------------------------------------------------
+   DRAWER / PANEL
+---------------------------------------------------------- */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: var(--surface);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------
+   FOOTER / BOTTOM BAR
+---------------------------------------------------------- */
+.footer-bar {
+  margin-top: auto;
+  padding: 12px 20px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ---------------------------------------------------------
+   EMPTY STATES
+---------------------------------------------------------- */
+.empty-state {
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE BREAKPOINTS
+---------------------------------------------------------- */
+@media (max-width: 1200px) {
+  .grid-kpi {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .layout-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+
+  .content {
+    padding: 0;
+  }
+
+  .grid-kpi {
+    grid-template-columns: 1fr;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------------------------------------------------------
+   PRINT-FRIENDLY MODE
+---------------------------------------------------------- */
+@media print {
+  .sidebar,
+  .chart-controls,
+  .time-filters,
+  .logout {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ---------------------------------------------------------
+   END OF LAYOUT
+---------------------------------------------------------- */

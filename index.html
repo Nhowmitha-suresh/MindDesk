@@ -1,30 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MindDesk Pro | Login</title>
-  <link rel="stylesheet" href="css/login.css">
-  <link rel="stylesheet" href="css/base.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindDesk | Login</title>
+
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/login.css" />
+
+  <!-- Fonts (professional, neutral) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
 
-<div class="login-container">
-  <div class="login-card">
-    <h1>MindDesk Pro</h1>
-    <p class="tagline">Personalized Productivity Intelligence</p>
+<body data-page="auth">
 
-    <label>Name</label>
-    <input id="username" placeholder="Enter your name">
+  <!-- ===============================
+       AUTH CONTAINER
+  ================================ -->
+  <main class="auth-container">
 
-    <label>Password</label>
-    <input id="password" type="password" placeholder="••••••••">
+    <!-- Left Panel (Branding / Value) -->
+    <section class="auth-info">
+      <h1 class="brand">MindDesk</h1>
+      <p class="tagline">
+        Understand your personality.<br />
+        Track growth. Make better decisions.
+      </p>
 
-    <button onclick="login()">Login</button>
+      <ul class="features">
+        <li>Psychometric analysis</li>
+        <li>Personality trends & insights</li>
+        <li>Professional analytics dashboard</li>
+      </ul>
+    </section>
 
-    <p class="hint">Demo login • No signup required</p>
-  </div>
-</div>
+    <!-- Right Panel (Forms) -->
+    <section class="auth-panel">
 
-<script src="js/auth.js"></script>
+      <!-- Message Box -->
+      <div id="authMessage" class="auth-message"></div>
+
+      <!-- ================= LOGIN ================= -->
+      <form id="loginForm" class="auth-form">
+        <h2>Sign in</h2>
+
+        <label>
+          Email address
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+          />
+        </label>
+
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            placeholder="••••••••"
+            required
+          />
+        </label>
+
+        <button type="submit" class="primary-btn">
+          Sign in
+        </button>
+
+        <p class="switch">
+          Don’t have an account?
+          <a href="#" onclick="toggleForms()">Create one</a>
+        </p>
+      </form>
+
+      <div style="margin-top:10px;">
+        <button type="button" class="secondary" onclick="useDemo()">Use demo account</button>
+      </div>
+
+      <!-- ================= SIGN UP ================= -->
+      <form id="signupForm" class="auth-form hidden">
+        <h2>Create account</h2>
+
+        <label>
+          Full name
+          <input
+            type="text"
+            name="name"
+            placeholder="Your name"
+            required
+          />
+        </label>
+
+        <label>
+          Email address
+          <input
+            type="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+          />
+        </label>
+
+        <label>
+          Password
+          <input
+            type="password"
+            name="password"
+            placeholder="Minimum 6 characters"
+            required
+          />
+        </label>
+
+        <button type="submit" class="primary-btn">
+          Create account
+        </button>
+
+        <p class="switch">
+          Already have an account?
+          <a href="#" onclick="toggleForms()">Sign in</a>
+        </p>
+      </form>
+
+    </section>
+  </main>
+
+  <!-- ===============================
+       SCRIPTS
+  ================================ -->
+  <script type="module" src="js/app.js"></script>
+
+  <!-- Simple toggle (UI only) -->
+  <script>
+    function toggleForms() {
+      document.getElementById("loginForm").classList.toggle("hidden");
+      document.getElementById("signupForm").classList.toggle("hidden");
+      document.getElementById("authMessage").textContent = "";
+    }
+
+    function useDemo() {
+      const demo = {
+        id: 'user_demo',
+        name: 'Demo User',
+        email: 'demo@local',
+        password: 'demopass',
+        createdAt: new Date().toISOString()
+      };
+      try {
+        localStorage.setItem('minddesk_users', JSON.stringify([demo]));
+        localStorage.setItem('minddesk_session', JSON.stringify(demo));
+      } catch (e) { console.error(e); }
+      window.location.href = 'dashboard.html';
+    }
+  </script>
+
 </body>
 </html>

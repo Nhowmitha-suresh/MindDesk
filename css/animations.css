@@ -1,0 +1,376 @@
+/* =========================================================
+   MINDDESK – PROFESSIONAL ANIMATIONS
+   Subtle | Purposeful | Analytics-grade
+   ========================================================= */
+
+/* -------------------------------
+   GLOBAL TRANSITIONS
+-------------------------------- */
+* {
+  transition-property: background-color, color, border-color, box-shadow, transform;
+  transition-duration: 180ms;
+  transition-timing-function: ease;
+}
+
+/* Disable motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* -------------------------------
+   PAGE LOAD ANIMATION
+-------------------------------- */
+.app {
+  animation: appFadeIn 0.4s ease forwards;
+}
+
+@keyframes appFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* -------------------------------
+   CARD MICRO INTERACTIONS
+-------------------------------- */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    circle at top left,
+    rgba(255,255,255,0.06),
+    transparent 60%
+  );
+  transition: opacity 200ms ease;
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+/* -------------------------------
+   KPI CARD EMPHASIS
+-------------------------------- */
+.kpi-card {
+  animation: scaleIn 0.35s ease forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* -------------------------------
+   SIDEBAR NAV INTERACTIONS
+-------------------------------- */
+.sidebar nav a {
+  position: relative;
+}
+
+.sidebar nav a::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  width: 4px;
+  height: 0;
+  background: var(--accent);
+  border-radius: 4px;
+  transform: translateY(-50%);
+  transition: height 160ms ease;
+}
+
+.sidebar nav a.active::before,
+.sidebar nav a:hover::before {
+  height: 60%;
+}
+
+.sidebar nav a:hover {
+  transform: translateX(2px);
+}
+
+/* -------------------------------
+   BUTTON INTERACTIONS
+-------------------------------- */
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* -------------------------------
+   CHART CONTAINER ANIMATION
+-------------------------------- */
+.chart-card {
+  animation: chartReveal 0.4s ease forwards;
+}
+
+@keyframes chartReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* -------------------------------
+   TABLE ROW HOVER
+-------------------------------- */
+table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+table tbody tr:hover {
+  background-color: rgba(99,102,241,0.04);
+}
+
+/* -------------------------------
+   FADE BETWEEN SECTIONS
+-------------------------------- */
+.section {
+  animation: sectionFade 0.25s ease forwards;
+}
+
+@keyframes sectionFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* -------------------------------
+   THEME SWITCH ANIMATION
+-------------------------------- */
+body {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+/* -------------------------------
+   TOOLTIP (OPTIONAL)
+-------------------------------- */
+.tooltip {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* -------------------------------
+   LOADING SKELETONS
+-------------------------------- */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.12) 37%,
+    rgba(255,255,255,0.05) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeletonLoad 1.4s ease infinite;
+}
+
+@keyframes skeletonLoad {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+/* -------------------------------
+   MODAL APPEARANCE
+-------------------------------- */
+.modal {
+  animation: modalScale 0.25s ease forwards;
+}
+
+@keyframes modalScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* -------------------------------
+   NOTIFICATION SLIDE-IN
+-------------------------------- */
+.toast {
+  animation: toastIn 0.35s ease forwards;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* -------------------------------
+   FOCUS STATES (ACCESSIBILITY)
+-------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* -------------------------------
+   SMOOTH SCROLL
+-------------------------------- */
+html {
+  scroll-behavior: smooth;
+}
+
+/* -------------------------------
+   ICON HOVER ROTATION (SUBTLE)
+-------------------------------- */
+.icon-hover {
+  display: inline-block;
+  transition: transform 200ms ease;
+}
+
+.icon-hover:hover {
+  transform: rotate(-4deg);
+}
+
+/* -------------------------------
+   SECTION HEADER SEPARATOR
+-------------------------------- */
+.section h2::after {
+  content: "";
+  display: block;
+  width: 36px;
+  height: 3px;
+  margin-top: 6px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* -------------------------------
+   END OF FILE
+-------------------------------- */
+
+/* -------------------------------
+   BRAND / CHARACTER ANIMATIONS
+-------------------------------- */
+.blink { animation: blinkEyes 4s infinite; }
+@keyframes blinkEyes {
+  0%, 96% { transform: scaleY(1); }
+  97% { transform: scaleY(0.08); }
+  100% { transform: scaleY(1); }
+}
+
+.floating-chars { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+.float-brain {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  transform: translateY(0);
+  animation: floatAcross 12s linear infinite;
+  opacity: 0.95;
+}
+
+@keyframes floatAcross {
+  0% { transform: translateX(-8%) translateY(0) scale(0.9); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: translateX(40vw) translateY(-6vh) scale(1); }
+  90% { opacity: 1; }
+  100% { transform: translateX(110vw) translateY(4vh) scale(0.9); opacity: 0; }
+}
+
+.pupil { transition: transform 120ms linear; transform-origin: center; }
+
+/* -------------------------------
+   Cute Brain Character Styles
+-------------------------------- */
+.brain-char { width: 48px; height: 48px; display: block; }
+.float-brain { width: 48px; height: 48px; }
+.brain-bob { animation: brainBob 6s ease-in-out infinite; }
+
+@keyframes brainBob {
+  0% { transform: translateX(-8%) translateY(0) scale(0.92); opacity: 0; }
+  10% { opacity: 1; }
+  40% { transform: translateX(20vw) translateY(-2vh) scale(1); }
+  70% { transform: translateX(60vw) translateY(2vh) scale(1.02); }
+  100% { transform: translateX(110vw) translateY(4vh) scale(0.92); opacity: 0; }
+}
+
+.brain-eye .pupil { transition: transform 120ms linear; }
+
+.brain-arm { transform-origin: 50% 50%; transition: transform 220ms ease; }
+.brain-arm.wave { animation: armWave 0.9s ease-in-out 3; }
+@keyframes armWave {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-20deg); }
+  50% { transform: rotate(12deg); }
+  75% { transform: rotate(-8deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.brain-leg { transform-origin: 50% 0%; transition: transform 220ms ease; }
+.brain-leg.kick { animation: legKick 0.6s ease-in-out 1; }
+@keyframes legKick {
+  0% { transform: rotate(0deg); }
+  40% { transform: rotate(28deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.brain-wink .eye-white { transform-origin: center; animation: wink 0.18s linear; }
+@keyframes wink { 0% { transform: scaleY(1); } 50% { transform: scaleY(0.06); } 100% { transform: scaleY(1); } }

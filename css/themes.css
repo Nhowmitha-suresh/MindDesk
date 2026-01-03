@@ -1,39 +1,284 @@
-/* Subtle theme variants — flat colors, no loud gradients or animations */
+/* =========================================================
+   MINDDESK – REALISTIC AMBIENT BACKGROUND THEMES
+   Background-only | Subtle | Professional
+   ========================================================= */
 
-body.sunrise {
-  --bg: #fffdf7;
-  --surface: #ffffff;
-  --accent: #f97316;
+/* ---------- BASE EFFECT LAYER ---------- */
+.bg-effects {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-body.midnight, body.dark {
+@media (prefers-reduced-motion: reduce) {
+  .bg-effects,
+  .bg-effects::before,
+  .bg-effects::after {
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   🌆 BUSY CITY (NIGHT TRAFFIC LIGHT STREAKS)
+   ========================================================= */
+body.theme-city {
   --bg: #020617;
   --surface: #0f172a;
-  --text-main: #e5e7eb;
-  --border: #1e293b;
+  --text: #e5e7eb;
+  --text-muted: #94a3b8;
   --accent: #38bdf8;
 }
 
-body.ocean {
-  --bg: #f1fbff;
-  --accent: #0284c7;
+body.theme-city .bg-effects::before,
+body.theme-city .bg-effects::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    linear-gradient(90deg,
+      transparent 40%,
+      rgba(255,255,255,0.08) 45%,
+      transparent 50%
+    ),
+    linear-gradient(90deg,
+      transparent 60%,
+      rgba(56,189,248,0.06) 65%,
+      transparent 70%
+    );
+  background-size: 300px 100%;
+  animation: cityTraffic 35s linear infinite;
+  opacity: 0.25;
 }
 
-body.zen {
-  --bg: #fbfffb;
-  --accent: #059669;
+body.theme-city .bg-effects::after {
+  animation-duration: 55s;
+  opacity: 0.15;
 }
 
-body.power {
-  --bg: #fff7f7;
-  --accent: #dc2626;
+@keyframes cityTraffic {
+  from { transform: translateX(0); }
+  to { transform: translateX(-20%); }
 }
 
-body.mono {
-  --bg: #0f172a;
+/* =========================================================
+   🌧️ RAINY CITY (RAIN + FOG)
+   ========================================================= */
+body.theme-rain {
+  --bg: #020617;
   --surface: #020617;
-  --text-main: #f8fafc;
-  --accent: #94a3b8;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --accent: #60a5fa;
 }
 
-/* Keep themes subtle — no animations here */
+body.theme-rain .bg-effects::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background:
+    repeating-linear-gradient(
+      120deg,
+      rgba(255,255,255,0.15),
+      rgba(255,255,255,0.15) 1px,
+      transparent 1px,
+      transparent 12px
+    );
+  animation: rainFall 25s linear infinite;
+  opacity: 0.15;
+}
+
+body.theme-rain .bg-effects::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
+  animation: fogMove 60s linear infinite;
+}
+
+@keyframes rainFall {
+  from { transform: translateY(-10%); }
+  to { transform: translateY(30%); }
+}
+
+@keyframes fogMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-6%); }
+}
+
+/* =========================================================
+   🌬️ WINDY DAY (AIRFLOW / DUST)
+   ========================================================= */
+body.theme-windy {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent: #64748b;
+}
+
+body.theme-windy .bg-effects::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(0,0,0,0.03),
+      rgba(0,0,0,0.03) 1px,
+      transparent 1px,
+      transparent 20px
+    );
+  animation: windFlow 45s linear infinite;
+}
+
+@keyframes windFlow {
+  from { transform: translateX(0); }
+  to { transform: translateX(-10%); }
+}
+
+/* =========================================================
+   🌊 OCEAN DRIFT (WAVES + LIGHT)
+   ========================================================= */
+body.theme-ocean {
+  --bg: #020617;
+  --surface: #020617;
+  --text: #e0f2fe;
+  --text-muted: #7dd3fc;
+  --accent: #38bdf8;
+}
+
+body.theme-ocean .bg-effects::before,
+body.theme-ocean .bg-effects::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(56,189,248,0.15), transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(14,165,233,0.12), transparent 60%);
+  animation: oceanDrift 60s ease-in-out infinite alternate;
+}
+
+@keyframes oceanDrift {
+  from { transform: translateY(-2%); }
+  to { transform: translateY(2%); }
+}
+
+/* =========================================================
+   🌸 SPRING BREEZE (POLLEN / PETALS)
+   ========================================================= */
+body.theme-spring {
+  --bg: #fdfcfb;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent: #ec4899;
+}
+
+body.theme-spring .bg-effects::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle, rgba(236,72,153,0.25) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(16,185,129,0.15) 0 2px, transparent 3px);
+  background-size: 160px 160px, 220px 220px;
+  animation: springFloat 50s linear infinite;
+  opacity: 0.2;
+}
+
+@keyframes springFloat {
+  from { transform: translateY(-5%) translateX(0); }
+  to { transform: translateY(10%) translateX(-6%); }
+}
+
+/* =========================================================
+   🍂 AUTUMN LEAVES (REFINED)
+   ========================================================= */
+body.theme-autumn .bg-effects::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background:
+    radial-gradient(circle, rgba(245,158,11,0.25) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(120,53,15,0.25) 0 2px, transparent 3px);
+  background-size: 140px 140px, 200px 200px;
+  animation: leavesDrift 55s linear infinite;
+}
+
+@keyframes leavesDrift {
+  from { transform: translateY(-8%) translateX(0); }
+  to { transform: translateY(20%) translateX(-8%); }
+}
+
+/* =========================================================
+   ❄️ SNOW (REFINED)
+   ========================================================= */
+body.theme-snow .bg-effects::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.6) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,255,255,0.4) 0 1px, transparent 2px);
+  background-size: 90px 90px, 140px 140px;
+  animation: snowDrift 70s linear infinite;
+  opacity: 0.35;
+}
+
+@keyframes snowDrift {
+  from { transform: translateY(-10%); }
+  to { transform: translateY(30%); }
+}
+
+/* =========================================================
+   END OF REALISTIC THEMES
+   ========================================================= */
+
+/* -------------------------------
+   CORE THREE THEMES: Light / Dark / Neon Gradient
+-------------------------------- */
+body.theme-light {
+  --bg: #f7fafc;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --accent: #6366f1;
+  --accent-soft: rgba(99,102,241,0.08);
+  --border: rgba(15,23,42,0.06);
+}
+
+body.theme-dark {
+  --bg: #0b1220;
+  --surface: #0f1724;
+  --surface-muted: #0b1220;
+  --text: #e6eef8;
+  --text-muted: #9aa7bb;
+  --accent: #60a5fa;
+  --accent-soft: rgba(96,165,250,0.08);
+  --border: rgba(255,255,255,0.04);
+}
+
+body.theme-neon {
+  --bg: linear-gradient(135deg,#0f1724 0%, #061826 40%, #08112a 60%, #061827 100%);
+  --surface: rgba(6,27,38,0.6);
+  --surface-muted: rgba(6,27,38,0.4);
+  --text: #e6f7ff;
+  --text-muted: #9bd9ff;
+  --accent: #7c3aed; /* purple */
+  --accent-2: #06b6d4; /* cyan */
+  --accent-soft: linear-gradient(90deg, rgba(124,58,237,0.12), rgba(6,182,212,0.08));
+  --border: rgba(255,255,255,0.06);
+}
+
+/* Apply background for neon theme */
+body.theme-neon::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(circle at 10% 20%, rgba(124,58,237,0.12), transparent 10%), radial-gradient(circle at 85% 80%, rgba(6,182,212,0.08), transparent 10%), linear-gradient(135deg,#061827 0%, #08112a 50%);
+  mix-blend-mode: screen;
+}

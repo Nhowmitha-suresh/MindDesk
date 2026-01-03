@@ -1,157 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MindDesk Pro</title>
+  <meta charset="UTF-8" />
+  <title>MindDesk | Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/dashboard.css">
-  <link rel="stylesheet" href="css/themes.css">
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/charts.css" />
+  <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/animations.css" />
 
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+
+<body data-page="dashboard">
 
 <div class="app">
 
+  <!-- =========================
+       SIDEBAR
+  ========================== -->
   <aside class="sidebar">
-    <h2 class="logo">MindDesk</h2>
-
-    <nav>
-      <a onclick="showSection('home')" data-target="home">Dashboard</a>
-      <a onclick="showSection('personality')" data-target="personality">Personality</a>
-      <a onclick="showSection('insights')" data-target="insights">Insights</a>
-      <a onclick="showSection('themes')" data-target="themes">Appearance</a>
-    </nav>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <button id="collapseBtn" aria-expanded="true">Collapse</button>
-      <button id="themeToggle" aria-pressed="false">Toggle theme</button>
-      <button class="logout" onclick="logout()">Logout</button>
+    <div class="brand">
+      <!-- Inline interactive brain logo -->
+      <svg id="minddesk_logo" width="120" height="36" viewBox="0 0 120 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="vertical-align:middle;">
+        <defs>
+          <linearGradient id="bgrad" x1="0" x2="1">
+            <stop offset="0" stop-color="#8b5cf6"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+        <g id="brainGroup">
+          <ellipse id="brainMain" cx="20" cy="18" rx="18" ry="14" fill="url(#bgrad)" />
+          <g id="eyes" transform="translate(8,10)">
+            <circle id="eyeL" cx="6" cy="6" r="3.2" fill="#fff" />
+            <circle id="pupilL" cx="6" cy="6" r="1.2" fill="#0f172a" />
+            <circle id="eyeR" cx="14" cy="6" r="3.2" fill="#fff" />
+            <circle id="pupilR" cx="14" cy="6" r="1.2" fill="#0f172a" />
+          </g>
+          <path id="smile" d="M8 22 C12 26, 20 26, 24 22" stroke="#061826" stroke-width="1.6" fill="transparent" stroke-linecap="round"/>
+        </g>
+        <text x="50" y="22" font-family="Inter, Arial, sans-serif" font-size="14" fill="#0f172a" font-weight="700">MindDesk</text>
+      </svg>
     </div>
+
+    <nav class="nav">
+      <button type="button" data-target="home" class="nav-item">Dashboard</button>
+      <button type="button" data-target="personality" class="nav-item">Personality</button>
+      <button type="button" data-target="insights" class="nav-item">Insights</button>
+      <button type="button" data-target="themes" class="nav-item">Appearance</button>
+      <button type="button" data-target="about" class="nav-item">About</button>
+      <button type="button" data-target="games" class="nav-item">Games</button>
+    </nav>
+
+    <button id="logoutBtn" class="logout-btn">Logout</button>
   </aside>
 
+  <!-- =========================
+       MAIN CONTENT
+  ========================== -->
   <main class="content">
-    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
-      <div>
-        <h1 id="greeting"></h1>
-        <p class="subtitle">Your personalized productivity overview</p>
-      </div>
+    <div id="floatingChars" class="floating-chars" aria-hidden="true"></div>
+    <button id="sidePanelToggle" title="Open insights panel" style="position:absolute;right:18px;top:18px;z-index:40;">Insights ▸</button>
 
-      <div style="display:flex;align-items:center;gap:12px;">
-        <input id="globalSearch" placeholder="Search dashboard..." aria-label="Search dashboard" />
-        <button id="openProfile">Profile</button>
-      </div>
-    </header>
-
+    <!-- ===== DASHBOARD ===== -->
     <section id="home" class="section">
-      <div class="grid">
-        <div class="card">
-          <h3>Personality Type</h3>
-          <p>Analytical – Creative</p>
-        </div>
+      <h1 id="greeting">Welcome</h1>
+      <p class="subtitle">Analytics overview of your personality</p>
 
+      <div class="cards">
         <div class="card">
-          <h3>Dominant Trait</h3>
-          <p>Logical Reasoning</p>
+          <h3>Overall Score</h3>
+          <p class="metric">78%</p>
         </div>
-
         <div class="card">
-          <h3>Focus Style</h3>
-          <p>Deep, long sessions</p>
+          <h3>Focus Index</h3>
+          <p class="metric">6.2h</p>
+        </div>
+        <div class="card">
+          <h3>Growth</h3>
+          <p class="metric">Stable</p>
         </div>
       </div>
     </section>
 
-    <section id="personality" class="section hidden">
-      <h2>Personality Analysis</h2>
-      <div id="questionBox"></div>
+    <!-- ===== ABOUT ===== -->
+    <section id="about" class="section" style="display:none">
+      <h2>About MindDesk</h2>
+      <p class="subtitle">MindDesk is a lightweight psychometric analytics demo showing trait scoring and trends based on user responses.</p>
+
+      <div class="card">
+        <h3>Application</h3>
+        <p>Use the Personality test to answer reflective questions. Scores are computed across multiple traits and shown in the Insights section. Data persists to your browser's localStorage.</p>
+
+        <h3 style="margin-top:12px">Famous Figures & Related Traits</h3>
+        <p>Examples of public figures often associated with these traits (for inspiration):</p>
+        <ul>
+          <li><strong>Vision:</strong> Steve Jobs, Elon Musk</li>
+          <li><strong>Drive:</strong> Serena Williams, Elon Musk</li>
+          <li><strong>Creativity:</strong> Leonardo da Vinci, Marie Curie</li>
+          <li><strong>Leadership:</strong> Nelson Mandela, Angela Merkel</li>
+          <li><strong>Ethics:</strong> Mahatma Gandhi, Malala Yousafzai</li>
+        </ul>
+
+        <h3 style="margin-top:12px">About Us</h3>
+        <p>MindDesk is a demo project for psychometric insights and analytics. It is frontend-only and stores data locally. For production use, integrate with a secure backend and proper data practices.</p>
+      </div>
     </section>
 
-    <section id="insights" class="section hidden">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-        <h2>Insights</h2>
-        <div>
-          <button id="exportCsv">Export CSV</button>
-          <button id="exportJson">Export JSON</button>
-          <button id="importBtn">Import CSV</button>
-          <input id="importCsv" type="file" accept=".csv" style="display:none" />
-        </div>
+    <!-- ===== PERSONALITY ===== -->
+    <section id="personality" class="section" style="display:none">
+      <h2>Personality Test</h2>
+      <p>Answer questions to analyze your traits.</p>
+
+      <div id="personalityApp" class="card card-scroll" style="max-height:70vh; padding:12px;">
+        <!-- Personality UI will be rendered here -->
+        <div id="personalityLoader">Loading questions…</div>
       </div>
-      <div id="chartControls" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;">
-        <label style="display:flex;align-items:center;gap:8px;">Chart
-          <select id="chartType">
-            <option value="radar">Radar</option>
-            <option value="bar">Bar</option>
-            <option value="line">Line</option>
-          </select>
-        </label>
-
-        <label style="display:flex;align-items:center;gap:8px;">Compare
-          <input type="checkbox" id="compareToggle" />
-        </label>
-
-        <div id="timeFilters" style="display:flex;gap:6px;">
-          <button data-range="today" class="time-filter">Today</button>
-          <button data-range="week" class="time-filter">Week</button>
-          <button data-range="month" class="time-filter">Month</button>
-          <button data-range="all" class="time-filter active">All</button>
-        </div>
-
-        <div id="traitToggles" style="display:flex;gap:8px;flex-wrap:wrap;margin-left:8px;"></div>
-      </div>
-
-      <canvas id="traitChart"></canvas>
     </section>
 
-    <section id="themes" class="section hidden">
+    <!-- ===== INSIGHTS ===== -->
+    <section id="insights" class="section" style="display:none">
+      <h2>Insights</h2>
+      <p>Your trait distribution and trends.</p>
+
+      <div class="chart-container" style="height:300px;">
+        <canvas id="traitChart"></canvas>
+      </div>
+      <div id="traitExplanation" style="margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+        <div id="traitExplanationCard" class="card" style="flex:1;padding:12px;min-height:80px">
+          <strong>Click a bar to view trait details</strong>
+          <div id="traitExplanationText" style="margin-top:8px;color:var(--text-muted)">Select any trait in the chart above to see what it means, sample strengths, and practical tips to improve.</div>
+        </div>
+        <div id="traitExamples" class="card" style="width:220px;padding:12px;min-height:80px">
+          <strong>Examples</strong>
+          <div id="traitExamplesList" style="margin-top:8px;color:var(--text-muted)">No trait selected.</div>
+        </div>
+      </div>
+
+      <div style="height:220px;margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <h3 style="margin:0;font-size:14px">Scores Over Time</h3>
+          <div>
+            <label style="font-size:13px;color:var(--text-muted);margin-right:8px">View:</label>
+            <select id="historyTraitSelect">
+              <option value="__average">Average</option>
+            </select>
+          </div>
+        </div>
+        <canvas id="traitHistoryChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ===== GAMES ===== -->
+    <section id="games" class="section" style="display:none">
+      <h2>Games</h2>
+      <p class="subtitle">Psychometric mini-games — quick, fun, and insightful.</p>
+      <div class="card">
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+          <button class="game-tab primary-btn" data-game="reaction">Reaction Time</button>
+          <button class="game-tab secondary" data-game="memory">Memory Sequence</button>
+          <button class="game-tab secondary" data-game="quickmath">Quick Math</button>
+          <button class="game-tab secondary" data-game="suspicious">Suspicious Button</button>
+          <button class="game-tab secondary" data-game="randompick">Random Pick</button>
+          <button class="game-tab secondary" data-game="annoy">Annoying Situation</button>
+          <button class="game-tab secondary" data-game="wwd">What Would You Do?</button>
+        </div>
+
+        <div id="gameArea">
+          <!-- Reaction game -->
+          <div id="game_reaction" class="game-screen">
+            <h3>Reaction Time Test</h3>
+            <p class="subtitle">Test your reflexes — simple and immediate. Try to click as fast as you can when the box turns green.</p>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button id="reactionStart" class="primary-btn">Start</button>
+              <button id="reactionNext" class="secondary">Next</button>
+            </div>
+            <div id="reactionBox" style="width:220px;height:120px;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;margin-top:10px">Wait...</div>
+            <div id="reactionResult" style="font-size:14px;color:var(--text-muted);margin-top:8px"></div>
+          </div>
+
+          <div id="game_suspicious" class="game-screen" style="display:none">
+            <h3>Suspicious Button</h3>
+            <p class="subtitle">A hilariously tempting button — press if you dare. See the playful result and try again with Next.</p>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:12px">
+              <button id="suspiciousBtn" class="primary-btn">Do Not Press</button>
+              <button id="suspiciousNext" class="secondary">Next</button>
+            </div>
+            <div id="suspiciousResult" style="margin-top:8px;color:var(--text-muted)"></div>
+          </div>
+
+          <div id="game_randompick" class="game-screen" style="display:none">
+            <h3>Random Pick</h3>
+            <p class="subtitle">Pick an icon at random — your choice produces a short, funny description.</p>
+            <div style="display:flex;gap:12px;margin-top:10px">
+              <button class="pick-img" data-pick="owl" style="font-size:22px;padding:20px">🦉</button>
+              <button class="pick-img" data-pick="cat" style="font-size:22px;padding:20px">🐱</button>
+              <button class="pick-img" data-pick="rocket" style="font-size:22px;padding:20px">🚀</button>
+              <button class="pick-img" data-pick="coffee" style="font-size:22px;padding:20px">☕</button>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div id="randompickResult" style="color:var(--text-muted)"></div>
+              <button id="randompickNext" class="secondary">Next</button>
+            </div>
+          </div>
+
+          <div id="game_annoy" class="game-screen" style="display:none">
+            <h3>Annoying Situation</h3>
+            <p class="subtitle">Pick your instinctive response to a mildly annoying social moment.</p>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="annoy-choice secondary" data-choice="ignore">Ignore and scroll phone</button>
+              <button class="annoy-choice secondary" data-choice="callout">Call them out politely</button>
+              <button class="annoy-choice secondary" data-choice="dramatic">Make a sarcastic joke</button>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div id="annoyResult" style="color:var(--text-muted)"></div>
+              <button id="annoyNext" class="secondary">Next</button>
+            </div>
+          </div>
+
+          <div id="game_wwd" class="game-screen" style="display:none">
+            <h3>What Would You Do?</h3>
+            <p class="subtitle">Quick whimsical scenarios — choose the reaction that feels most you.</p>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+              <div>You're offered a cookie you didn't order. You:</div>
+              <div style="display:flex;gap:8px">
+                <button class="wwd-choice secondary" data-choice="eat">Eat it immediately</button>
+                <button class="wwd-choice secondary" data-choice="ask">Ask whose it is</button>
+                <button class="wwd-choice secondary" data-choice="share">Offer to share</button>
+              </div>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div id="wwdResult" style="color:var(--text-muted)"></div>
+              <button id="wwdNext" class="secondary">Next</button>
+            </div>
+          </div>
+          <!-- Memory sequence game -->
+          <div id="game_memory" class="game-screen" style="display:none">
+            <h3>Memory Sequence</h3>
+            <p class="subtitle">Watch the pattern, then repeat it exactly. Each round grows by one step.</p>
+            <div id="memTiles" style="display:flex;gap:8px;margin-top:10px"></div>
+            <div style="margin-top:10px">
+              <button id="memStart" class="primary-btn">Start</button>
+              <button id="memNext" class="secondary">Next</button>
+              <button id="memReset" class="secondary">Reset</button>
+            </div>
+            <div id="memResult" style="font-size:14px;color:var(--text-muted);margin-top:8px"></div>
+          </div>
+
+          <!-- Quick math game -->
+          <div id="game_quickmath" class="game-screen" style="display:none">
+            <h3>Quick Math</h3>
+            <p class="subtitle">Solve quick addition puzzles to keep your brain sharp. Tap "New Round" for a fresh question.</p>
+            <div id="mathQuestion" style="font-size:18px;margin-top:8px"></div>
+            <input id="mathAnswer" type="number" style="width:120px;margin-top:8px" />
+            <div style="margin-top:8px">
+              <button id="mathSubmit" class="primary-btn">Submit</button>
+              <button id="mathStart" class="secondary">New Round</button>
+              <button id="mathNext" class="secondary">Next</button>
+            </div>
+            <div id="mathResult" style="font-size:14px;color:var(--text-muted);margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== THEMES ===== -->
+    <section id="themes" class="section" style="display:none">
       <h2>Appearance</h2>
+      <p>Select a theme.</p>
+
       <div class="theme-grid">
-        <button onclick="setTheme('sunrise')">Sunrise</button>
-        <button onclick="setTheme('midnight')">Midnight</button>
-        <button onclick="setTheme('ocean')">Ocean</button>
-        <button onclick="setTheme('zen')">Zen</button>
-        <button onclick="setTheme('power')">Power</button>
-        <button onclick="setTheme('mono')">Mono</button>
+        <button data-theme="theme-light">Light</button>
+        <button data-theme="theme-dark">Dark</button>
+        <button data-theme="theme-neon">Neon</button>
       </div>
     </section>
 
   </main>
-
 </div>
 
-  <!-- Profile Modal -->
-  <div id="profileModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
-    <div class="modal-content">
-      <h3 id="profileTitle">Profile Settings</h3>
-      <label>Name</label>
-      <input id="profileName" placeholder="Your display name" />
-
-      <label>Avatar URL (optional)</label>
-      <input id="profileAvatar" placeholder="https://..." />
-
-      <div class="modal-actions">
-        <button id="saveProfile">Save</button>
-        <button id="cancelProfile">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Onboarding / First-run hints -->
-  <div id="onboarding" class="onboarding hidden" aria-hidden="true">
-    <div class="onboarding-step" data-step="1">
-      <h4>Welcome to MindDesk</h4>
-      <p>Use the left navigation to explore Dashboard, Personality, and Insights.</p>
-      <div class="onboarding-actions">
-        <button id="onboardingNext">Next</button>
-        <button id="onboardingSkip">Skip</button>
-      </div>
-    </div>
-  </div>
-
+<!-- App scripts -->
+<script type="module" src="js/app.js"></script>
 <script src="js/navigation.js"></script>
-<script src="js/personality.js"></script>
-<script src="js/charts.js"></script>
-<script src="js/personalization.js"></script>
-<script src="js/auth.js"></script>
+<script src="js/games.js"></script>
+<script src="js/brand.js"></script>
+
+<!-- Inline fallback removed in favor of central scripts -->
+
 </body>
 </html>
+
+<!-- ===== SIDE PANEL (RICH INSIGHTS) ===== -->
+<aside id="sidePanel" class="side-panel" aria-hidden="true">
+  <div class="side-panel-header">
+    <strong>Insights Panel</strong>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="exportCsvBtn" class="secondary">Export CSV</button>
+      <button id="copyJsonBtn" class="secondary">Copy JSON</button>
+      <button id="sidePanelClose" class="secondary">Close</button>
+    </div>
+  </div>
+
+  <div class="side-panel-body">
+    <section class="panel-section">
+      <h4>Compare Traits</h4>
+      <div class="compare-controls">
+        <select id="compareTraitA"><option value="__average">Select trait A</option></select>
+        <select id="compareTraitB"><option value="__average">Select trait B</option></select>
+        <button id="compareBtn" class="primary-btn">Compare</button>
+      </div>
+      <div style="height:200px;margin-top:8px">
+        <canvas id="compareHistoryChart"></canvas>
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <h4>Recommended Exercises</h4>
+      <ul id="recommendedExercises">
+        <li>Daily 5-minute reflection: note one success and one learning.</li>
+        <li>Micro-challenges: pick a tiny stretch goal and repeat weekly.</li>
+        <li>Controlled breathing: 3-3-6 pattern for emotion regulation.</li>
+      </ul>
+    </section>
+
+    <section class="panel-section">
+      <h4>Celebrity Cards</h4>
+      <div id="celebrityCards" class="celebrity-cards">
+        <div class="celebrity-card"><strong>Oprah</strong><div class="muted">Resilience, Leadership</div></div>
+        <div class="celebrity-card"><strong>Serena</strong><div class="muted">Drive, Focus</div></div>
+        <div class="celebrity-card"><strong>Steve</strong><div class="muted">Creativity, Vision</div></div>
+      </div>
+    </section>
+
+    <section class="panel-section">
+      <h4>Example Behaviors</h4>
+      <ul id="exampleBehaviors">
+        <li>Resilience: Reframe setbacks and list next-step actions.</li>
+        <li>Conscientiousness: Break projects into micro-tasks and schedule them.</li>
+      </ul>
+    </section>
+  </div>
+</aside>
+
