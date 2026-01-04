@@ -2,6 +2,17 @@
 
 MindDesk is a frontend-only psychometric analytics application designed to evaluate personality traits through structured self-assessment questions and interactive mini-games. It provides analytical insights using a modern dashboard interface and stores all data locally in the browser.
 
+
+<img width="1919" height="1079" alt="Screenshot 2026-01-04 205145" src="https://github.com/user-attachments/assets/076d87e5-da03-40c8-80f3-5648149d0d18" />
+<img width="1919" height="1078" alt="Screenshot 2026-01-04 205053" src="https://github.com/user-attachments/assets/915a54ef-1616-4fa6-b96a-36c431acfc67" />
+<img width="1879" height="1031" alt="Screenshot 2026-01-04 205044" src="https://github.com/user-attachments/assets/6522c736-55ea-4a02-88c4-d49a1320f6f0" />
+<img width="1895" height="1073" alt="Screenshot 2026-01-04 205102" src="https://github.com/user-attachments/assets/da18772b-e836-4654-983d-546f5dad281f" />
+<img width="1919" height="1079" alt="Screenshot 2026-01-04 205120" src="https://github.com/user-attachments/assets/8657d4d5-df36-4d5d-9abb-e8b6ca55bed8" />
+
+
+
+
+
 ---
 
 ## Features
