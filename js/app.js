@@ -95,11 +95,64 @@ if (page === "dashboard") {
       });
     }
 
+    function ensureBgEffects() {
+      let bg = document.querySelector('.bg-effects');
+      if (!bg) {
+        bg = document.createElement('div');
+        bg.className = 'bg-effects';
+        document.body.appendChild(bg);
+      }
+      return bg;
+    }
+
+    function applyBlings(theme) {
+      try {
+        const container = ensureBgEffects();
+        // respect user preference
+        const enabled = localStorage.getItem('minddesk_blings_enabled');
+        if (enabled === '0') {
+          // remove blings if present
+          container.querySelectorAll('.bling')?.forEach(n=>n.remove());
+          return;
+        }
+        // remove existing blings
+        container.querySelectorAll('.bling')?.forEach(n=>n.remove());
+
+        // create tasteful blings depending on theme
+        const count = 8;
+        for (let i=0;i<count;i++){
+          const b = document.createElement('div');
+          b.className = 'bling';
+          // size classes
+          const sz = i % 3 === 0 ? 'medium' : (i % 2 === 0 ? 'small' : 'floaty');
+          b.classList.add(sz);
+          // random position across the viewport
+          const left = Math.floor(Math.random()*90) + '%';
+          const top = Math.floor(Math.random()*75) + '%';
+          b.style.left = left;
+          b.style.top = top;
+          // slow variation in animation delay
+          b.style.animationDelay = (Math.random()*2)+'s';
+          container.appendChild(b);
+        }
+      } catch(e) { console.warn('applyBlings failed', e); }
+    }
+
+    // Expose a refresh function for other modules (e.g., side panel toggle)
+    try { window.minddesk_refreshBlings = function(){ const t = Array.from(document.body.classList).find(c=>c.startsWith('theme-')); try { applyBlings(t); } catch(e){} }; } catch(e) {}
+
     function applyTheme(theme) {
       if (!theme) return;
       removeExistingThemeClasses();
       document.body.classList.add(theme);
       try { saveTheme(theme); } catch (e) { console.error(e); }
+      // ensure background effect element exists and add blings
+      ensureBgEffects();
+      applyBlings(theme);
+      // update active state on buttons
+      themeButtons.forEach(btn => {
+        if (btn.dataset.theme === theme) btn.classList.add('active'); else btn.classList.remove('active');
+      });
     }
 
     // initialize theme from storage
@@ -124,6 +177,29 @@ if (page === "dashboard") {
     try { initTraitChart(); } catch (e) { console.warn('Trait chart init failed', e); }
 
     try { initTraitHistory(); } catch (e) { console.warn('Trait history init failed', e); }
+
+    // Add a quick "View Score Details" CTA in the dashboard cards
+    try {
+      const overallCard = document.querySelector('.cards .card');
+      if (overallCard) {
+        const btn = document.createElement('button');
+        btn.className = 'secondary';
+        btn.style.marginTop = '8px';
+        btn.textContent = 'View Score Details';
+        overallCard.appendChild(btn);
+        btn.addEventListener('click', () => {
+          try {
+            const panel = document.getElementById('sidePanel');
+            const toggle = document.getElementById('sidePanelToggle');
+            if (panel) panel.classList.add('open');
+            if (toggle) toggle.style.display = 'none';
+            try { window.minddesk_generateRecommendations && window.minddesk_generateRecommendations(); } catch(e){}
+            try { window.wireSidePanelButtons && window.wireSidePanelButtons(); } catch(e){}
+            try { window.refreshTraitChart && window.refreshTraitChart(); } catch(e){}
+          } catch(e) { /* ignore */ }
+        });
+      }
+    } catch (e) { /* ignore */ }
 
     // Theme detective: suggest a theme based on dominant trait
     try {

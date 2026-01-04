@@ -282,3 +282,37 @@ body.theme-neon::before {
   background: radial-gradient(circle at 10% 20%, rgba(124,58,237,0.12), transparent 10%), radial-gradient(circle at 85% 80%, rgba(6,182,212,0.08), transparent 10%), linear-gradient(135deg,#061827 0%, #08112a 50%);
   mix-blend-mode: screen;
 }
+
+/* =====================
+   BLINGS / ACCENT EFFECTS
+   Small, tasteful animated highlights for themes
+   Respect `prefers-reduced-motion`.
+   ===================== */
+.bg-effects { pointer-events: none; }
+.bg-effects .bling { position: absolute; border-radius: 50%; opacity: 0.0; transform: translate3d(0,0,0); }
+
+@keyframes blingPulse {
+  0% { opacity: 0; transform: scale(0.6) translateY(0); }
+  40% { opacity: 0.9; transform: scale(1.05) translateY(-6px); }
+  100% { opacity: 0; transform: scale(1.2) translateY(-12px); }
+}
+
+@keyframes blingFloat {
+  from { transform: translateY(0) translateX(0) rotate(0deg); }
+  to { transform: translateY(-18px) translateX(8px) rotate(12deg); }
+}
+
+/* theme-specific accent blings */
+body.theme-neon .bg-effects .bling { background: radial-gradient(circle, rgba(124,58,237,0.9), rgba(6,182,212,0.6)); box-shadow: 0 6px 20px rgba(124,58,237,0.12); }
+body.theme-city .bg-effects .bling { background: radial-gradient(circle, rgba(56,189,248,0.9), rgba(99,102,241,0.6)); box-shadow: 0 8px 22px rgba(56,189,248,0.08); }
+body.theme-ocean .bg-effects .bling { background: radial-gradient(circle, rgba(14,165,233,0.9), rgba(56,189,248,0.6)); box-shadow: 0 8px 20px rgba(14,165,233,0.08); }
+body.theme-spring .bg-effects .bling { background: radial-gradient(circle, rgba(236,72,153,0.9), rgba(16,185,129,0.6)); box-shadow: 0 8px 20px rgba(236,72,153,0.06); }
+
+/* small bling styles */
+.bg-effects .bling.small { width: 8px; height: 8px; animation: blingPulse 2200ms ease-in-out infinite; }
+.bg-effects .bling.medium { width: 14px; height: 14px; animation: blingPulse 3200ms ease-in-out infinite; }
+.bg-effects .bling.floaty { width: 10px; height: 10px; animation: blingFloat 8000ms ease-in-out infinite; opacity: 0.65; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-effects .bling, .bg-effects::before, .bg-effects::after { animation: none !important; opacity: 0.7 !important; }
+}

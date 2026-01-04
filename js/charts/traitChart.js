@@ -1,6 +1,20 @@
 // Use the global Chart provided by the page script include
 // dashboard.html already loads Chart.js via CDN so we rely on `window.Chart` here.
 
+// Optional Ollama integration for AI-driven tips (lazy import)
+let _generateAiTips = null;
+async function ensureAiClient() {
+  if (_generateAiTips) return _generateAiTips;
+  try {
+    const mod = await import('../ai/ollama.js');
+    _generateAiTips = mod.generateAiTips;
+    return _generateAiTips;
+  } catch (e) {
+    console.warn('AI tips module unavailable', e);
+    return null;
+  }
+}
+
 const SCORE_KEY = 'minddesk_scores';
 const HISTORY_KEY = 'minddesk_scores_history';
 
@@ -94,6 +108,8 @@ export function initTraitChart() {
 
   // initialize compare controls if side panel exists
   try { initCompareControls(); } catch (e) { /* ignore */ }
+  // wire side-panel utilities (export/copy/recommendations + AI tips)
+  try { wireSidePanelButtons(); } catch (e) { /* ignore */ }
 
   // Listen for programmatic score updates (same-window)
   try {
@@ -305,6 +321,86 @@ function wireSidePanelButtons() {
       const obs = new MutationObserver(() => { if (panel.classList.contains('open')) generateRecommendations(); });
       obs.observe(panel, { attributes: true, attributeFilter: ['class'] });
     }
+    // AI tips area: add a button and container if missing
+    try {
+      const body = document.querySelector('.side-panel-body');
+      if (body && !document.getElementById('aiTipsContainer')) {
+        const sec = document.createElement('section'); sec.className = 'panel-section';
+        sec.innerHTML = `<h4>AI Recommendations</h4><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button id="generateAiTipsBtn" class="primary-btn">Generate AI Tips</button><button id="refreshAiBtn" class="secondary">Refresh</button></div><div id="aiTipsContainer" style="min-height:80px;color:var(--text-muted)">AI tips will appear here.</div>`;
+        body.appendChild(sec);
+
+        const gen = document.getElementById('generateAiTipsBtn');
+        const ref = document.getElementById('refreshAiBtn');
+        const container = document.getElementById('aiTipsContainer');
+        async function runAi() {
+          const genFn = await ensureAiClient();
+          if (!genFn) { container.textContent = 'AI module not available. Ensure Ollama client file exists.'; return; }
+          container.textContent = 'Generating tips…';
+          try {
+            const payload = genFn(getLatestScores());
+            const text = typeof payload === 'string' ? payload : await Promise.resolve(payload);
+            container.textContent = text;
+          } catch (e) { container.textContent = 'AI generation failed: ' + (e.message || e); }
+        }
+        gen?.addEventListener('click', runAi);
+        ref?.addEventListener('click', runAi);
+
+        // Scoreboard details section (exportable, table view)
+        try {
+          if (!document.getElementById('scoreboardDetails')) {
+            const sc = document.createElement('section'); sc.className = 'panel-section'; sc.id = 'scoreboardDetails';
+            sc.innerHTML = `<h4>Scoreboard Details</h4><div style="margin-bottom:8px;display:flex;gap:8px;align-items:center"><button id="exportHistoryBtn" class="secondary">Export History (CSV)</button><button id="copyScoresBtn" class="secondary">Copy Current Scores</button></div><div style="overflow:auto"><table id="scoreboardTable" style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:6px">Trait</th><th style="text-align:right;padding:6px">Score</th></tr></thead><tbody></tbody></table></div>`;
+            body.appendChild(sc);
+          }
+          const exportBtn = document.getElementById('exportHistoryBtn');
+          const copyBtn = document.getElementById('copyScoresBtn');
+          const tableBody = document.querySelector('#scoreboardTable tbody');
+          function populateScoreboard() {
+            const scores = getLatestScores() || {};
+            tableBody.innerHTML = '';
+            const keys = Object.keys(scores).sort();
+            keys.forEach(k=>{
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td style="padding:6px;border-bottom:1px solid rgba(0,0,0,0.04)">${k}</td><td style="padding:6px;border-bottom:1px solid rgba(0,0,0,0.04);text-align:right">${(typeof scores[k]==='number')?scores[k]+'%':'--'}</td>`;
+              tableBody.appendChild(tr);
+            });
+          }
+          exportBtn?.addEventListener('click', ()=>{ const ok = downloadCSV(); if (!ok) alert('No history to export yet.'); });
+          copyBtn?.addEventListener('click', ()=>{ const p = copyScoresJSON(); if (p) { try { navigator.clipboard.writeText(JSON.stringify(p.scores || {}, null, 2)); alert('Scores copied'); } catch(e){ alert('Copy failed'); } } else alert('Nothing to copy'); });
+          // refresh on open
+          populateScoreboard();
+          window.addEventListener('minddesk_scores_updated', populateScoreboard);
+        } catch(e){ console.warn('scoreboard details init failed', e); }
+
+        // Bling toggle (store in localStorage)
+        try {
+          if (!document.getElementById('blingToggleWrap')) {
+            const sw = document.createElement('section'); sw.className='panel-section'; sw.id='blingToggleWrap';
+            sw.innerHTML = `<h4>Decorative Accents</h4><label style="display:flex;gap:8px;align-items:center"><input id="blingToggle" type="checkbox" /> Enable blings (animated accents)</label>`;
+            body.appendChild(sw);
+            const ch = document.getElementById('blingToggle');
+            const stored = localStorage.getItem('minddesk_blings_enabled');
+            ch.checked = stored === null ? true : stored === '1';
+            ch.addEventListener('change', ()=>{
+              localStorage.setItem('minddesk_blings_enabled', ch.checked ? '1' : '0');
+              try { window.minddesk_refreshBlings && window.minddesk_refreshBlings(); } catch(e){}
+            });
+          }
+        } catch(e){ console.warn('bling toggle init failed', e); }
+
+        // When panel opens, auto-run recommendations and AI tips and refresh scoreboard
+        if (panel) {
+          const obs2 = new MutationObserver(() => {
+            if (panel.classList.contains('open')) {
+              try { generateRecommendations(); } catch(e){}
+              try { runAi(); } catch(e){}
+              try { const pop = document.querySelector('#scoreboardTable tbody'); if (pop) { const ev = new Event('refreshScoreboard'); pop.dispatchEvent(ev); } } catch(e){}
+            }
+          });
+          obs2.observe(panel, { attributes:true, attributeFilter:['class'] });
+        }
+      }
+    } catch (e) { console.warn('Failed to create AI tips UI', e); }
   } catch(e) { /* ignore */ }
 }
 
