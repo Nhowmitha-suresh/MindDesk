@@ -1,96 +1,95 @@
-# MindDesk
+## MindDesk – Psychometric Personality Analytics Platform
 
-MindDesk is a web-based self-discovery platform that helps users understand their everyday thinking patterns, emotional responses, and behavioral tendencies through a combination of reflective questions, visual insights, and light-hearted games. The platform is designed to be non-judgmental, engaging, and approachable, focusing on awareness rather than evaluation.
-
----
-
-## Purpose
-
-Traditional psychometric tests often feel rigid, stressful, or overly technical. MindDesk takes a different approach by presenting self-reflection as a calm and enjoyable experience. Users are not scored or ranked. Instead, they are guided to notice patterns in how they think, feel, and react in everyday situations.
+MindDesk is a frontend-only psychometric analytics application designed to evaluate personality traits through structured self-assessment questions and interactive mini-games. It provides analytical insights using a modern dashboard interface and stores all data locally in the browser.
 
 ---
 
-## Test Questions
+## Features
 
-The test questions are designed as short, situational prompts rather than academic or clinical assessments. Each question focuses on real-life behavior, preferences, or reactions. There are no correct or incorrect answers. The goal is to capture consistent patterns over time rather than isolated responses.
+### Authentication (Demo Mode)
+- Simple login interface
+- Demo account access
+- No backend or database dependency
 
-Questions generally fall into the following categories:
-- Decision-making and thinking style  
-- Emotional awareness and regulation  
-- Social interaction and communication  
-- Stress response and adaptability  
+### Personality Test
+- Likert-scale questions (1–5)
+- Trait-based scoring system
+- Pagination-based navigation
+- Real-time response tracking
 
-Each response contributes gently to one or more traits, allowing a balanced and flexible understanding of the user.
+### Analytics Dashboard
+- Overall personality score
+- Focus index and growth indicator
+- Trait-wise analytics
+- Clean and professional UI
 
----
+### Insights Panel
+- Trait comparison against average values
+- Export results as CSV
+- Copy results as JSON
+- Dynamic insights based on user responses
 
-## Traits and Insights
+### Psychometric Mini-Games
+- Reaction Time
+- Memory Sequence
+- Quick Math
+- Suspicious Button
+- Random Pick
+- Annoying Situation
+- What Would You Do?
 
-MindDesk does not assign fixed personality labels. Instead, it tracks soft human traits that exist on a spectrum. These traits represent tendencies rather than definitions and may change over time.
+Mini-games are designed to capture behavioral tendencies in a subtle and engaging way.
 
-Core trait areas include:
-- Cognitive traits (analytical vs intuitive thinking, overthinking patterns)  
-- Emotional traits (stress sensitivity, emotional awareness)  
-- Social traits (interaction comfort, empathy)  
-- Behavioral traits (impulsiveness, patience, adaptability)  
-
-Traits are presented as insights to encourage self-awareness, not judgment.
-
----
-
-## Charts and Visualization
-
-Visualizations are used to help users understand patterns rather than measure performance. Charts provide an overview of how traits relate to one another and how they may change over time.
-
-Common visual formats include:
-- Radar charts to show multiple traits together  
-- Bar charts to compare tendencies side by side  
-- Trend views to observe changes across sessions  
-
-The emphasis is on reflection and growth, not comparison with others.
-
----
-
-## Games and Interactive Experiences
-
-In addition to reflective tests, MindDesk includes playful, intentionally unserious mini-games. These games are designed to reduce pressure, increase engagement, and add emotional balance to the experience.
-
-The games focus on humor and relatability rather than accuracy. They present exaggerated scenarios, visual choices, or quick reactions that feel familiar to everyday life. Results are descriptive and light-hearted, allowing users to laugh and feel understood without being analyzed.
-
-Games act as a complementary layer that keeps the platform enjoyable and welcoming.
+### Educational Insights
+- Example behaviors for each trait
+- Recommended exercises
+- Celebrity trait associations (for inspiration only)
 
 ---
 
-## Design Philosophy
+## Tech Stack
 
-MindDesk follows three key principles:
-- Non-judgmental self-awareness  
-- Emotional comfort and relatability  
-- Simplicity and clarity  
+- **HTML5** – Structure
+- **CSS3** – Styling, themes, animations
+- **JavaScript (ES Modules)** – Application logic
+- **LocalStorage** – Client-side data persistence
 
-The platform avoids rigid labels, scoring systems, and competitive elements, making it suitable for casual use, personal reflection, and educational projects.
-
----
-
-## Technology Overview
-
-- HTML for structure  
-- CSS for layout, themes, and animations  
-- JavaScript for interaction and logic  
-- Chart.js for visual insights  
-- LocalStorage for session and data persistence  
-
-The project is frontend-only and does not require a backend server.
+No frameworks, backend services, or external APIs are used.
 
 ---
 
-## Disclaimer
+## Project Structure
 
-MindDesk is not a medical or psychological diagnostic tool. All insights and results are intended for self-reflection and entertainment purposes only.
+<img width="378" height="343" alt="image" src="https://github.com/user-attachments/assets/c94b8b81-80e1-45fa-8bde-cc9d80bcadac" />
 
 ---
 
-## Author
+## How to Run the Project
 
-Nhowmitha Suresh  
-AI & Data Science Student
+### Using Live Server
+1. Open the project in VS Code
+2. Right-click `index.html`
+3. Select **Open with Live Server**
+
+
+### Data Handling
+
+All user responses are stored in browser LocalStorage
+
+No data is sent to external servers
+
+Data can be exported as CSV or JSON
+
+ ### Disclaimer
+
+MindDesk is a demonstration project intended for educational purposes only. It is not a clinical or professional psychological assessment tool.
+
+### Author
+
+Nhowmitha Suresh
+B.Tech – AI & Data Science
+
+
+### Using Python HTTP Server
+```bash
+python -m http.server 5500
