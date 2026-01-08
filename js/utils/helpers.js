@@ -1,308 +1,208 @@
 /* =========================================================
-   MINDDESK – PROFESSIONAL ANIMATIONS
-   Subtle | Purposeful | Analytics-grade
+   MindDesk – Helper Utilities
+   Shared, reusable helper functions across the app
    ========================================================= */
 
-/* -------------------------------
-   GLOBAL TRANSITIONS
--------------------------------- */
-* {
-  transition-property: background-color, color, border-color, box-shadow, transform;
-  transition-duration: 180ms;
-  transition-timing-function: ease;
+/* =========================================================
+   TYPE & VALUE HELPERS
+   ========================================================= */
+
+/* Check if value is a number */
+export function isNumber(value) {
+  return typeof value === "number" && !Number.isNaN(value);
 }
 
-/* Disable motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
+/* Clamp number within range */
+export function clamp(value, min, max) {
+  if (!isNumber(value)) return min;
+  return Math.min(Math.max(value, min), max);
+}
+
+/* Round to given decimals */
+export function round(value, decimals = 0) {
+  if (!isNumber(value)) return 0;
+  const factor = Math.pow(10, decimals);
+  return Math.round(value * factor) / factor;
+}
+
+/* =========================================================
+   ARRAY HELPERS
+   ========================================================= */
+
+/* Average of numeric array */
+export function average(arr = []) {
+  const nums = arr.filter(isNumber);
+  if (!nums.length) return 0;
+  return nums.reduce((a, b) => a + b, 0) / nums.length;
+}
+
+/* Sum of numeric array */
+export function sum(arr = []) {
+  return arr.filter(isNumber).reduce((a, b) => a + b, 0);
+}
+
+/* Get unique values */
+export function unique(arr = []) {
+  return [...new Set(arr)];
+}
+
+/* =========================================================
+   OBJECT HELPERS
+   ========================================================= */
+
+/* Deep clone (JSON-safe objects) */
+export function deepClone(obj) {
+  try {
+    return JSON.parse(JSON.stringify(obj));
+  } catch {
+    return null;
   }
 }
 
-/* -------------------------------
-   PAGE LOAD ANIMATION
--------------------------------- */
-.app {
-  animation: appFadeIn 0.4s ease forwards;
-}
+/* Merge numeric objects by averaging values */
+export function mergeAverage(objects = []) {
+  const totals = {};
+  const counts = {};
 
-@keyframes appFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
+  objects.forEach(obj => {
+    for (const key in obj) {
+      if (!isNumber(obj[key])) continue;
+      totals[key] = (totals[key] || 0) + obj[key];
+      counts[key] = (counts[key] || 0) + 1;
+    }
+  });
+
+  const result = {};
+  for (const key in totals) {
+    result[key] = Math.round(totals[key] / counts[key]);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+  return result;
 }
 
-/* -------------------------------
-   CARD MICRO INTERACTIONS
--------------------------------- */
-.card {
-  position: relative;
-  overflow: hidden;
+/* =========================================================
+   DATE & TIME HELPERS
+   ========================================================= */
+
+/* ISO string from Date */
+export function toISO(date = new Date()) {
+  return date.toISOString();
 }
 
-.card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  background: radial-gradient(
-    circle at top left,
-    rgba(255,255,255,0.06),
-    transparent 60%
+/* Days difference between dates */
+export function daysBetween(date1, date2) {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  return Math.abs(
+    (d2 - d1) / (1000 * 60 * 60 * 24)
   );
-  transition: opacity 200ms ease;
 }
 
-.card:hover::after {
-  opacity: 1;
+/* Check if date is within last N days */
+export function isWithinDays(date, days) {
+  return daysBetween(date, new Date()) <= days;
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+/* =========================================================
+   STRING HELPERS
+   ========================================================= */
+
+/* Capitalize first letter */
+export function capitalize(str = "") {
+  if (typeof str !== "string") return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-/* -------------------------------
-   KPI CARD EMPHASIS
--------------------------------- */
-.kpi-card {
-  animation: scaleIn 0.35s ease forwards;
+/* Convert camelCase to readable label */
+export function camelToLabel(str = "") {
+  return str
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, s => s.toUpperCase());
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
+/* =========================================================
+   RANDOM & ID HELPERS
+   ========================================================= */
+
+/* Generate random ID */
+export function generateId(prefix = "id") {
+  return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/* Shuffle array (Fisher–Yates) */
+export function shuffle(arr = []) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
   }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  return copy;
 }
 
-/* -------------------------------
-   SIDEBAR NAV INTERACTIONS
--------------------------------- */
-.sidebar nav a {
-  position: relative;
-}
+/* =========================================================
+   SAFE EXECUTION HELPERS
+   ========================================================= */
 
-.sidebar nav a::before {
-  content: "";
-  position: absolute;
-  left: -8px;
-  top: 50%;
-  width: 4px;
-  height: 0;
-  background: var(--accent);
-  border-radius: 4px;
-  transform: translateY(-50%);
-  transition: height 160ms ease;
-}
-
-.sidebar nav a.active::before,
-.sidebar nav a:hover::before {
-  height: 60%;
-}
-
-.sidebar nav a:hover {
-  transform: translateX(2px);
-}
-
-/* -------------------------------
-   BUTTON INTERACTIONS
--------------------------------- */
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  transform: translateY(-1px);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-/* -------------------------------
-   CHART CONTAINER ANIMATION
--------------------------------- */
-.chart-card {
-  animation: chartReveal 0.4s ease forwards;
-}
-
-@keyframes chartReveal {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* Try-catch wrapper */
+export function safeExecute(fn, fallback = null) {
+  try {
+    return fn();
+  } catch (e) {
+    console.error("Safe execute error:", e);
+    return fallback;
   }
 }
 
-/* -------------------------------
-   TABLE ROW HOVER
--------------------------------- */
-table tbody tr {
-  transition: background-color 120ms ease;
+/* =========================================================
+   UI HELPERS (LOGIC ONLY, NO DOM)
+   ========================================================= */
+
+/* Score → qualitative label */
+export function scoreLabel(score) {
+  if (!isNumber(score)) return "Unknown";
+  if (score >= 75) return "High";
+  if (score >= 45) return "Moderate";
+  return "Low";
 }
 
-table tbody tr:hover {
-  background-color: rgba(99,102,241,0.04);
+/* Score → color category (for charts) */
+export function scoreColor(score) {
+  if (!isNumber(score)) return "neutral";
+  if (score >= 75) return "success";
+  if (score >= 45) return "warning";
+  return "danger";
 }
 
-/* -------------------------------
-   FADE BETWEEN SECTIONS
--------------------------------- */
-.section {
-  animation: sectionFade 0.25s ease forwards;
+/* =========================================================
+   VALIDATION HELPERS
+   ========================================================= */
+
+/* Validate Likert response */
+export function isValidLikert(value, min = 1, max = 5) {
+  return isNumber(value) && value >= min && value <= max;
 }
 
-@keyframes sectionFade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Validate score object */
+export function validateScoreObject(scores = {}) {
+  return Object.values(scores).every(isNumber);
 }
 
-/* -------------------------------
-   THEME SWITCH ANIMATION
--------------------------------- */
-body {
-  transition: background-color 300ms ease, color 300ms ease;
+/* =========================================================
+   DEBUG HELPERS (DEV ONLY)
+   ========================================================= */
+
+/* Pretty log */
+export function log(label, data) {
+  console.log(`[${label}]`, data);
 }
 
-/* -------------------------------
-   TOOLTIP (OPTIONAL)
--------------------------------- */
-.tooltip {
-  position: absolute;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(4px);
-  transition: opacity 120ms ease, transform 120ms ease;
+/* Measure execution time */
+export function timeExecution(fn) {
+  const start = performance.now();
+  const result = fn();
+  const end = performance.now();
+  return {
+    result,
+    timeMs: round(end - start, 2)
+  };
 }
-
-.tooltip.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* -------------------------------
-   LOADING SKELETONS
--------------------------------- */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0.05) 25%,
-    rgba(255,255,255,0.12) 37%,
-    rgba(255,255,255,0.05) 63%
-  );
-  background-size: 400% 100%;
-  animation: skeletonLoad 1.4s ease infinite;
-}
-
-@keyframes skeletonLoad {
-  from {
-    background-position: 100% 0;
-  }
-  to {
-    background-position: 0 0;
-  }
-}
-
-/* -------------------------------
-   MODAL APPEARANCE
--------------------------------- */
-.modal {
-  animation: modalScale 0.25s ease forwards;
-}
-
-@keyframes modalScale {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* -------------------------------
-   NOTIFICATION SLIDE-IN
--------------------------------- */
-.toast {
-  animation: toastIn 0.35s ease forwards;
-}
-
-@keyframes toastIn {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* -------------------------------
-   FOCUS STATES (ACCESSIBILITY)
--------------------------------- */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* -------------------------------
-   SMOOTH SCROLL
--------------------------------- */
-html {
-  scroll-behavior: smooth;
-}
-
-/* -------------------------------
-   ICON HOVER ROTATION (SUBTLE)
--------------------------------- */
-.icon-hover {
-  display: inline-block;
-  transition: transform 200ms ease;
-}
-
-.icon-hover:hover {
-  transform: rotate(-4deg);
-}
-
-/* -------------------------------
-   SECTION HEADER SEPARATOR
--------------------------------- */
-.section h2::after {
-  content: "";
-  display: block;
-  width: 36px;
-  height: 3px;
-  margin-top: 6px;
-  background: var(--accent);
-  border-radius: 2px;
-}
-
-/* -------------------------------
-   END OF FILE
--------------------------------- */
