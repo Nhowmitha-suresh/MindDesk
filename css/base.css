@@ -135,13 +135,17 @@ button {
   border-radius: var(--radius-sm);
   padding: 8px 14px;
   font-size: 13px;
-  background: var(--accent);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 88%, #ffffff 0%), color-mix(in oklab, var(--accent) 88%, #000000 8%));
   color: #ffffff;
+  box-shadow: 0 6px 16px color-mix(in oklab, var(--accent) 18%, transparent 82%);
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent 70%);
 }
 
 button.secondary {
   background: var(--surface-muted);
   color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
 }
 
 button.ghost {
@@ -226,6 +230,7 @@ select:focus {
   border-radius: var(--radius-lg);
   padding: 20px;
   box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
 }
 
 /* -------------------------------
@@ -338,8 +343,11 @@ td {
 /* Ensure personality container is above decorative/background layers */
 #personalityApp {
   position: relative;
-  z-index: 9999;
+  z-index: 1000;
   background: transparent;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 #personalityApp label {

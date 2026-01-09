@@ -394,6 +394,7 @@ a,
   display: flex;
   flex-direction: column;
 }
+.side-panel:not(.open) { pointer-events: none; }
 .side-panel.open { right: 18px; }
 .side-panel-header { display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;border-bottom:1px solid var(--border); }
 .side-panel-body { overflow:auto;padding-top:8px;display:flex;flex-direction:column;gap:12px }

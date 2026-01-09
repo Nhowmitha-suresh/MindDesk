@@ -1,17 +1,51 @@
 /* =========================================================
-   MINDDESK – REALISTIC AMBIENT BACKGROUND THEMES
-   Background-only | Subtle | Professional
-   ========================================================= */
+   MINDDESK – ENHANCED AMBIENT BACKGROUND THEMES
+   SAFE • PROFESSIONAL • CLICK-SAFE
+========================================================= */
 
-/* ---------- BASE EFFECT LAYER ---------- */
+/* =========================================================
+   GLOBAL SAFETY LAYER FIX (CRITICAL)
+========================================================= */
+
+/* Background & pseudo elements must NEVER capture clicks */
+.bg-effects,
+.bg-effects::before,
+.bg-effects::after,
+body::before,
+body::after {
+  pointer-events: none !important;
+}
+
+/* App content must always stay above backgrounds */
+#personalityApp,
+#dashboardApp,
+.main-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* Inputs must always remain clickable */
+input,
+button,
+label {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 11;
+  cursor: pointer;
+}
+
+/* =========================================================
+   BASE EFFECT LAYER
+========================================================= */
+
 .bg-effects {
   position: fixed;
   inset: 0;
-  z-index: -1;
-  pointer-events: none;
+  z-index: -2;
   overflow: hidden;
 }
 
+/* Reduce motion support */
 @media (prefers-reduced-motion: reduce) {
   .bg-effects,
   .bg-effects::before,
@@ -21,11 +55,13 @@
 }
 
 /* =========================================================
-   🌆 BUSY CITY (NIGHT TRAFFIC LIGHT STREAKS)
-   ========================================================= */
+   🌆 CITY NIGHT – TRAFFIC STREAKS
+========================================================= */
+
 body.theme-city {
   --bg: #020617;
   --surface: #0f172a;
+  --surface-muted: #020617;
   --text: #e5e7eb;
   --text-muted: #94a3b8;
   --accent: #38bdf8;
@@ -48,12 +84,12 @@ body.theme-city .bg-effects::after {
       transparent 70%
     );
   background-size: 300px 100%;
-  animation: cityTraffic 35s linear infinite;
+  animation: cityTraffic 40s linear infinite;
   opacity: 0.25;
 }
 
 body.theme-city .bg-effects::after {
-  animation-duration: 55s;
+  animation-duration: 65s;
   opacity: 0.15;
 }
 
@@ -63,11 +99,13 @@ body.theme-city .bg-effects::after {
 }
 
 /* =========================================================
-   🌧️ RAINY CITY (RAIN + FOG)
-   ========================================================= */
+   🌧️ RAINY CITY – RAIN + FOG
+========================================================= */
+
 body.theme-rain {
   --bg: #020617;
   --surface: #020617;
+  --surface-muted: #020617;
   --text: #e5e7eb;
   --text-muted: #9ca3af;
   --accent: #60a5fa;
@@ -80,12 +118,12 @@ body.theme-rain .bg-effects::before {
   background:
     repeating-linear-gradient(
       120deg,
-      rgba(255,255,255,0.15),
-      rgba(255,255,255,0.15) 1px,
+      rgba(255,255,255,0.12),
+      rgba(255,255,255,0.12) 1px,
       transparent 1px,
-      transparent 12px
+      transparent 14px
     );
-  animation: rainFall 25s linear infinite;
+  animation: rainFall 28s linear infinite;
   opacity: 0.15;
 }
 
@@ -93,12 +131,13 @@ body.theme-rain .bg-effects::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 60%);
-  animation: fogMove 60s linear infinite;
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.06), transparent 65%);
+  animation: fogMove 70s linear infinite;
 }
 
 @keyframes rainFall {
-  from { transform: translateY(-10%); }
+  from { transform: translateY(-12%); }
   to { transform: translateY(30%); }
 }
 
@@ -108,11 +147,13 @@ body.theme-rain .bg-effects::after {
 }
 
 /* =========================================================
-   🌬️ WINDY DAY (AIRFLOW / DUST)
-   ========================================================= */
+   🌬️ WINDY DAY – AIRFLOW
+========================================================= */
+
 body.theme-windy {
   --bg: #f8fafc;
   --surface: #ffffff;
+  --surface-muted: #f1f5f9;
   --text: #0f172a;
   --text-muted: #64748b;
   --accent: #64748b;
@@ -125,12 +166,12 @@ body.theme-windy .bg-effects::before {
   background:
     repeating-linear-gradient(
       135deg,
-      rgba(0,0,0,0.03),
-      rgba(0,0,0,0.03) 1px,
+      rgba(0,0,0,0.025),
+      rgba(0,0,0,0.025) 1px,
       transparent 1px,
-      transparent 20px
+      transparent 22px
     );
-  animation: windFlow 45s linear infinite;
+  animation: windFlow 50s linear infinite;
 }
 
 @keyframes windFlow {
@@ -139,11 +180,13 @@ body.theme-windy .bg-effects::before {
 }
 
 /* =========================================================
-   🌊 OCEAN DRIFT (WAVES + LIGHT)
-   ========================================================= */
+   🌊 OCEAN DRIFT – WAVES & LIGHT
+========================================================= */
+
 body.theme-ocean {
   --bg: #020617;
   --surface: #020617;
+  --surface-muted: #020617;
   --text: #e0f2fe;
   --text-muted: #7dd3fc;
   --accent: #38bdf8;
@@ -155,9 +198,9 @@ body.theme-ocean .bg-effects::after {
   position: absolute;
   inset: -30%;
   background:
-    radial-gradient(circle at 30% 40%, rgba(56,189,248,0.15), transparent 60%),
-    radial-gradient(circle at 70% 60%, rgba(14,165,233,0.12), transparent 60%);
-  animation: oceanDrift 60s ease-in-out infinite alternate;
+    radial-gradient(circle at 30% 40%, rgba(56,189,248,0.14), transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(14,165,233,0.10), transparent 60%);
+  animation: oceanDrift 70s ease-in-out infinite alternate;
 }
 
 @keyframes oceanDrift {
@@ -166,11 +209,13 @@ body.theme-ocean .bg-effects::after {
 }
 
 /* =========================================================
-   🌸 SPRING BREEZE (POLLEN / PETALS)
-   ========================================================= */
+   🌸 SPRING – POLLEN / PETALS
+========================================================= */
+
 body.theme-spring {
   --bg: #fdfcfb;
   --surface: #ffffff;
+  --surface-muted: #f1f5f9;
   --text: #0f172a;
   --text-muted: #64748b;
   --accent: #ec4899;
@@ -181,10 +226,10 @@ body.theme-spring .bg-effects::before {
   position: absolute;
   inset: -30%;
   background:
-    radial-gradient(circle, rgba(236,72,153,0.25) 0 2px, transparent 3px),
-    radial-gradient(circle, rgba(16,185,129,0.15) 0 2px, transparent 3px);
+    radial-gradient(circle, rgba(236,72,153,0.18) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(16,185,129,0.12) 0 2px, transparent 3px);
   background-size: 160px 160px, 220px 220px;
-  animation: springFloat 50s linear infinite;
+  animation: springFloat 55s linear infinite;
   opacity: 0.2;
 }
 
@@ -194,17 +239,18 @@ body.theme-spring .bg-effects::before {
 }
 
 /* =========================================================
-   🍂 AUTUMN LEAVES (REFINED)
-   ========================================================= */
+   🍂 AUTUMN LEAVES
+========================================================= */
+
 body.theme-autumn .bg-effects::before {
   content: "";
   position: absolute;
   inset: -40%;
   background:
-    radial-gradient(circle, rgba(245,158,11,0.25) 0 2px, transparent 3px),
-    radial-gradient(circle, rgba(120,53,15,0.25) 0 2px, transparent 3px);
+    radial-gradient(circle, rgba(245,158,11,0.22) 0 2px, transparent 3px),
+    radial-gradient(circle, rgba(120,53,15,0.22) 0 2px, transparent 3px);
   background-size: 140px 140px, 200px 200px;
-  animation: leavesDrift 55s linear infinite;
+  animation: leavesDrift 60s linear infinite;
 }
 
 @keyframes leavesDrift {
@@ -213,17 +259,18 @@ body.theme-autumn .bg-effects::before {
 }
 
 /* =========================================================
-   ❄️ SNOW (REFINED)
-   ========================================================= */
+   ❄️ SNOW
+========================================================= */
+
 body.theme-snow .bg-effects::before {
   content: "";
   position: absolute;
   inset: -30%;
   background:
-    radial-gradient(circle, rgba(255,255,255,0.6) 0 1px, transparent 2px),
-    radial-gradient(circle, rgba(255,255,255,0.4) 0 1px, transparent 2px);
+    radial-gradient(circle, rgba(255,255,255,0.5) 0 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,255,255,0.35) 0 1px, transparent 2px);
   background-size: 90px 90px, 140px 140px;
-  animation: snowDrift 70s linear infinite;
+  animation: snowDrift 75s linear infinite;
   opacity: 0.35;
 }
 
@@ -233,12 +280,9 @@ body.theme-snow .bg-effects::before {
 }
 
 /* =========================================================
-   END OF REALISTIC THEMES
-   ========================================================= */
+   CORE THEMES – LIGHT / DARK / NEON
+========================================================= */
 
-/* -------------------------------
-   CORE THREE THEMES: Light / Dark / Neon Gradient
--------------------------------- */
 body.theme-light {
   --bg: #f7fafc;
   --surface: #ffffff;
@@ -263,56 +307,32 @@ body.theme-dark {
 
 body.theme-neon {
   --bg: linear-gradient(135deg,#0f1724 0%, #061826 40%, #08112a 60%, #061827 100%);
-  --surface: rgba(6,27,38,0.6);
-  --surface-muted: rgba(6,27,38,0.4);
+  --surface: rgba(6,27,38,0.65);
+  --surface-muted: rgba(6,27,38,0.45);
   --text: #e6f7ff;
   --text-muted: #9bd9ff;
-  --accent: #7c3aed; /* purple */
-  --accent-2: #06b6d4; /* cyan */
-  --accent-soft: linear-gradient(90deg, rgba(124,58,237,0.12), rgba(6,182,212,0.08));
+  --accent: #7c3aed;
+  --accent-2: #06b6d4;
+  --accent-soft: linear-gradient(
+    90deg,
+    rgba(124,58,237,0.12),
+    rgba(6,182,212,0.08)
+  );
   --border: rgba(255,255,255,0.06);
 }
 
-/* Apply background for neon theme */
+/* Neon background layer */
 body.theme-neon::before {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
-  z-index: -2;
-  background: radial-gradient(circle at 10% 20%, rgba(124,58,237,0.12), transparent 10%), radial-gradient(circle at 85% 80%, rgba(6,182,212,0.08), transparent 10%), linear-gradient(135deg,#061827 0%, #08112a 50%);
-  mix-blend-mode: screen;
+  z-index: -3;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(124,58,237,0.12), transparent 10%),
+    radial-gradient(circle at 85% 80%, rgba(6,182,212,0.08), transparent 10%),
+    linear-gradient(135deg,#061827 0%, #08112a 50%);
 }
 
-/* =====================
-   BLINGS / ACCENT EFFECTS
-   Small, tasteful animated highlights for themes
-   Respect `prefers-reduced-motion`.
-   ===================== */
-.bg-effects { pointer-events: none; }
-.bg-effects .bling { position: absolute; border-radius: 50%; opacity: 0.0; transform: translate3d(0,0,0); }
-
-@keyframes blingPulse {
-  0% { opacity: 0; transform: scale(0.6) translateY(0); }
-  40% { opacity: 0.9; transform: scale(1.05) translateY(-6px); }
-  100% { opacity: 0; transform: scale(1.2) translateY(-12px); }
-}
-
-@keyframes blingFloat {
-  from { transform: translateY(0) translateX(0) rotate(0deg); }
-  to { transform: translateY(-18px) translateX(8px) rotate(12deg); }
-}
-
-/* theme-specific accent blings */
-body.theme-neon .bg-effects .bling { background: radial-gradient(circle, rgba(124,58,237,0.9), rgba(6,182,212,0.6)); box-shadow: 0 6px 20px rgba(124,58,237,0.12); }
-body.theme-city .bg-effects .bling { background: radial-gradient(circle, rgba(56,189,248,0.9), rgba(99,102,241,0.6)); box-shadow: 0 8px 22px rgba(56,189,248,0.08); }
-body.theme-ocean .bg-effects .bling { background: radial-gradient(circle, rgba(14,165,233,0.9), rgba(56,189,248,0.6)); box-shadow: 0 8px 20px rgba(14,165,233,0.08); }
-body.theme-spring .bg-effects .bling { background: radial-gradient(circle, rgba(236,72,153,0.9), rgba(16,185,129,0.6)); box-shadow: 0 8px 20px rgba(236,72,153,0.06); }
-
-/* small bling styles */
-.bg-effects .bling.small { width: 8px; height: 8px; animation: blingPulse 2200ms ease-in-out infinite; }
-.bg-effects .bling.medium { width: 14px; height: 14px; animation: blingPulse 3200ms ease-in-out infinite; }
-.bg-effects .bling.floaty { width: 10px; height: 10px; animation: blingFloat 8000ms ease-in-out infinite; opacity: 0.65; }
-
-@media (prefers-reduced-motion: reduce) {
-  .bg-effects .bling, .bg-effects::before, .bg-effects::after { animation: none !important; opacity: 0.7 !important; }
-}
+/* =========================================================
+   END OF ENHANCED THEMES
+========================================================= */

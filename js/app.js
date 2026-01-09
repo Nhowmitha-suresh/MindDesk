@@ -178,6 +178,20 @@ if (page === "dashboard") {
 
     try { initTraitHistory(); } catch (e) { console.warn('Trait history init failed', e); }
 
+    // Ensure side panel is inside body and wired correctly
+    try {
+      const panel = document.getElementById('sidePanel');
+      if (panel && panel.parentElement !== document.body) {
+        document.body.appendChild(panel);
+      }
+      const toggleBtn = document.getElementById('sidePanelToggle');
+      const closeBtn = document.getElementById('sidePanelClose');
+      const openPanel = () => { if (panel){ panel.classList.add('open'); if (toggleBtn) toggleBtn.style.display = 'none'; } };
+      const closePanel = () => { if (panel){ panel.classList.remove('open'); if (toggleBtn) toggleBtn.style.display = ''; } };
+      toggleBtn && toggleBtn.addEventListener('click', openPanel);
+      closeBtn && closeBtn.addEventListener('click', closePanel);
+    } catch (e) { /* ignore wiring errors */ }
+
     // Add a quick "View Score Details" CTA in the dashboard cards
     try {
       const overallCard = document.querySelector('.cards .card');

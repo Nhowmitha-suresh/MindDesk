@@ -1,367 +1,424 @@
+/* ============================================================
+   MindDesk – Personality Test UI Engine
+   File: ui.js
+   Author: Nhowmitha Suresh
+============================================================ */
+
 import { QUESTIONS } from "./questions.js";
-import { calculateScores, fillMissingScores, saveScoreSnapshot, validateAnswers } from "./scoring.js";
+import {
+  calculateScores,
+  fillMissingScores,
+  saveScoreSnapshot
+} from "./scoring.js";
 import { buildInsightReport, saveInsightSnapshot } from "./insights.js";
 
-// Mapping of trait keywords to example public figures for motivational context
-const CELEBRITY_MAP = {
-  'Resilience': ['Oprah Winfrey'],
-  'EmotionalRegulation': ['Barack Obama'],
-  'Conscientiousness': ['Satya Nadella'],
-  'Accountability': ['Jacinda Ardern'],
-  'GrowthMindset': ['Elon Musk'],
-  'SelfAwareness': ['Brené Brown'],
-  'Adaptability': ['Reed Hastings'],
-  'Creativity': ['Steve Jobs'],
-  'Leadership': ['Nelson Mandela'],
-  'Drive': ['Serena Williams'],
-  'Ethics': ['Mahatma Gandhi'],
-  'ProblemSolving': ['Marie Curie'],
-  'DecisionMaking': ['Angela Merkel'],
-  'Communication': ['Oprah Winfrey'],
-  'Vision': ['Elon Musk']
-};
-
-const STORAGE_KEY = 'minddesk_personality_answers';
+/* ============================================================
+   CONSTANTS
+============================================================ */
 
 const APP_ID = "personalityApp";
+const STORAGE_KEY = "minddesk_personality_answers";
+const PAGE_KEY = "minddesk_personality_page";
+const PAGE_SIZE = 5;
+const AUTO_ADVANCE = false;
+const ANIMATE_PAGES = false;
 
-function createQuestionEl(q, savedAnswers = {}) {
-  const wrapper = document.createElement("div");
-  wrapper.className = "form-group";
+/* ============================================================
+   STATE
+============================================================ */
 
-  const label = document.createElement("label");
-  label.textContent = `${q.id}. ${q.text}`;
-  label.style.fontWeight = "600";
-  label.style.marginBottom = "6px";
+let currentPage = 0;
+let answersCache = {};
 
-  const opts = document.createElement("div");
-  opts.className = "inline";
+/* ============================================================
+   STORAGE
+============================================================ */
 
-    const selectedValue = savedAnswers[q.id] ? Number(savedAnswers[q.id]) : null;
-
-    for (let i = 1; i <= 5; i++) {
-      const opt = document.createElement("button");
-      opt.type = 'button';
-      opt.className = 'option-btn';
-      opt.dataset.qid = String(q.id);
-      opt.dataset.value = String(i);
-      opt.setAttribute('aria-pressed', selectedValue === i ? 'true' : 'false');
-      opt.style.display = 'inline-flex';
-      opt.style.alignItems = 'center';
-      opt.style.gap = '6px';
-      opt.style.border = 'none';
-      opt.style.background = 'transparent';
-      opt.style.color = 'inherit';
-      opt.style.fontSize = '13px';
-      opt.style.padding = '6px 10px';
-
-      const dot = document.createElement('span');
-      dot.className = 'fake-radio';
-      dot.style.display = 'inline-block';
-      dot.style.width = '16px';
-      dot.style.height = '16px';
-      dot.style.borderRadius = '50%';
-      dot.style.border = '2px solid rgba(255,255,255,0.35)';
-      dot.style.background = selectedValue === i ? 'var(--accent)' : 'transparent';
-      dot.style.marginRight = '8px';
-
-      const text = document.createElement("span");
-      text.textContent = String(i);
-
-      opt.appendChild(dot);
-      opt.appendChild(text);
-
-      // click handler
-      opt.addEventListener('click', () => {
-        // deselect siblings
-        const group = opts.querySelectorAll('button.option-btn');
-        group.forEach(b => {
-          b.querySelector('.fake-radio').style.background = 'transparent';
-          b.setAttribute('aria-pressed', 'false');
-        });
-
-        dot.style.background = 'var(--accent)';
-        opt.setAttribute('aria-pressed', 'true');
-
-        // save to localStorage immediately
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY) || '{}';
-          const map = JSON.parse(raw);
-          map[q.id] = Number(opt.dataset.value);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-        } catch (e) { }
-
-        // update progress bar if present
-        const evt = new CustomEvent('minddesk_answers_changed');
-        window.dispatchEvent(evt);
-      });
-
-      opts.appendChild(opt);
-    }
-
-  wrapper.appendChild(label);
-  wrapper.appendChild(opts);
-
-  return wrapper;
+function loadAnswers() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
 }
 
-function renderForm(container) {
-  container.innerHTML = "";
+function saveAnswer(qid, value) {
+  answersCache[String(qid)] = value;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(answersCache));
+  window.dispatchEvent(new CustomEvent("minddesk_answers_changed"));
+}
 
-  // load saved answers
-  let saved = {};
-  try { const raw = localStorage.getItem(STORAGE_KEY); saved = raw ? JSON.parse(raw) : {}; } catch (e) { saved = {}; }
+/* ============================================================
+   PAGINATION
+============================================================ */
 
-  const form = document.createElement("form");
-  form.id = "personalityForm";
-  form.style.display = "flex";
-  form.style.flexDirection = "column";
-  form.style.gap = "12px";
+function totalPages() {
+  return Math.ceil(QUESTIONS.length / PAGE_SIZE);
+}
 
-  const intro = document.createElement("p");
-  intro.className = "subtitle";
-  intro.textContent = "Answer on a scale: 1 (Low) — 5 (High). Use pagination to navigate.";
-  form.appendChild(intro);
+function pageQuestions(page) {
+  const start = page * PAGE_SIZE;
+  return QUESTIONS.slice(start, start + PAGE_SIZE);
+}
 
-  // pagination
-  const pageSize = 5;
-  let page = 0;
-  const totalPages = Math.ceil(QUESTIONS.length / pageSize);
+function pageCompleted(page) {
+  return pageQuestions(page).every(
+    q => typeof answersCache[String(q.id)] === "number"
+  );
+}
 
-  const progress = document.createElement('div');
-  progress.id = 'personalityProgress';
-  progress.style.height = '8px';
-  progress.style.background = 'var(--surface-muted)';
-  progress.style.borderRadius = '6px';
-  progress.style.overflow = 'hidden';
-  progress.style.marginBottom = '8px';
-  const bar = document.createElement('div');
-  bar.style.height = '100%';
-  bar.style.width = '0%';
-  bar.style.background = 'var(--accent)';
-  progress.appendChild(bar);
-  form.appendChild(progress);
+/* ============================================================
+   PROGRESS
+============================================================ */
 
-  const pageContainer = document.createElement('div');
-  pageContainer.id = 'personalityPageContainer';
-  pageContainer.style.display = 'grid';
-  pageContainer.style.gap = '10px';
-  form.appendChild(pageContainer);
+function createProgressBar() {
+  const wrap = document.createElement("div");
+  wrap.style.height = "8px";
+  wrap.style.background = "var(--surface-muted)";
+  wrap.style.borderRadius = "6px";
 
-  const actions = document.createElement("div");
-  actions.style.display = "flex";
-  actions.style.justifyContent = 'space-between';
-  actions.style.alignItems = 'center';
-  actions.style.gap = "8px";
+  const bar = document.createElement("div");
+  bar.id = "personalityProgressBar";
+  bar.style.height = "100%";
+  bar.style.width = "0%";
+  bar.style.background = "var(--accent)";
+  wrap.appendChild(bar);
 
-  const navLeft = document.createElement('div');
-  const prev = document.createElement("button");
-  prev.type = 'button'; prev.className = 'secondary'; prev.textContent = 'Previous';
-  prev.disabled = true;
-  navLeft.appendChild(prev);
+  return wrap;
+}
 
-  const navRight = document.createElement('div');
-  const next = document.createElement("button");
-  next.type = 'button'; next.className = 'secondary'; next.textContent = 'Next';
-  navRight.appendChild(next);
+function updateProgress() {
+  const answered = Object.keys(answersCache).length;
+  const pct = Math.round((answered / QUESTIONS.length) * 100);
+  const bar = document.getElementById("personalityProgressBar");
+  if (bar) bar.style.width = pct + "%";
+}
 
-  const submit = document.createElement("button");
-  submit.type = "submit";
-  submit.className = "primary-btn";
-  submit.textContent = "Submit Test";
+function createPageIndicator() {
+  const el = document.createElement("div");
+  el.id = "personalityPageIndicator";
+  el.style.fontSize = "12px";
+  el.style.color = "var(--text-muted)";
+  el.style.marginBottom = "6px";
+  return el;
+}
 
-  const clear = document.createElement("button");
-  clear.type = "button";
-  clear.className = "secondary";
-  clear.textContent = "Clear Answers";
+/* ============================================================
+   QUESTION UI (RADIO + AUTO-SCROLL)
+============================================================ */
 
-  navRight.appendChild(submit);
-  navRight.appendChild(clear);
+function createQuestion(q, indexInPage, container) {
+  const wrap = document.createElement("fieldset");
+  wrap.className = "form-group";
+  wrap.style.border = "none";
+  wrap.dataset.index = indexInPage;
 
-  actions.appendChild(navLeft);
-  actions.appendChild(navRight);
+  const legend = document.createElement("legend");
+  legend.textContent = `${q.id}. ${q.text}`;
+  legend.style.fontWeight = "600";
 
-  form.appendChild(actions);
+  const scale = document.createElement("div");
+  scale.style.display = "flex";
+  scale.style.gap = "14px";
+  scale.style.marginTop = "8px";
 
-  const resultBox = document.createElement("div");
-  resultBox.id = "personalityResult";
-  resultBox.style.marginTop = "12px";
-  form.appendChild(resultBox);
+  for (let i = 1; i <= 5; i++) {
+    const label = document.createElement("label");
+    label.style.display = "flex";
+    label.style.alignItems = "center";
+    label.style.gap = "6px";
+    label.style.cursor = "pointer";
 
-  function saveAnswersAutosave() {
-    // read saved map from localStorage (buttons write to storage on click)
-    let data = {};
-    try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch (e) { data = {}; }
-    // update progress
-    const answered = Object.keys(data).length;
-    const pct = Math.round((answered / QUESTIONS.length) * 100);
-    bar.style.width = pct + '%';
-  }
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = `q_${q.id}`;
+    radio.value = i;
 
-  function renderPage(p) {
-    pageContainer.innerHTML = '';
-    // refresh saved answers from storage so selections persist across pagination
-    try { const raw = localStorage.getItem(STORAGE_KEY); saved = raw ? JSON.parse(raw) : {}; } catch (e) { saved = {}; }
-    const start = p * pageSize;
-    const slice = QUESTIONS.slice(start, start + pageSize);
-    slice.forEach(q => {
-      const el = createQuestionEl(q, saved);
-      pageContainer.appendChild(el);
-    });
-    prev.disabled = p === 0;
-    next.disabled = p >= totalPages - 1;
-    // update progress bar from saved
-    saveAnswersAutosave();
-  }
-
-  prev.addEventListener('click', () => { if (page>0) { page--; renderPage(page); } });
-  next.addEventListener('click', () => { if (page<totalPages-1) { page++; renderPage(page); } });
-
-  // Final submit
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const answersMap = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    const answers = QUESTIONS.map(q => ({ id: q.id, value: answersMap[q.id] ? Number(answersMap[q.id]) : null }));
-
-    // allow partial scoring: compute using answered items; warn if incomplete
-    const answered = answers.filter(a => typeof a.value === 'number' && !Number.isNaN(a.value));
-    if (answered.length === 0) {
-      resultBox.innerHTML = `<div class="card" style="background:#fff6f6;color:#b91c1c">No answers found. Please answer at least one question.</div>`;
-      return;
+    if (answersCache[String(q.id)] === i) {
+      radio.checked = true;
     }
 
-    // inform user if not all answered
-    const incompleteNotice = answered.length < QUESTIONS.length ? `<div class="card" style="background:#fffdef;color:#92400e">Partial responses detected — results computed from answered items (${answered.length}/${QUESTIONS.length}). For best accuracy, complete all items.</div>` : '';
-
-    const scores = calculateScores(answered, QUESTIONS);
-    const filled = fillMissingScores(scores, 50);
-
-    // persist snapshot
-    try { saveScoreSnapshot(filled); } catch (err) { /* ignore */ }
-    try { saveInsightSnapshot(filled); } catch (err) { /* ignore */ }
-
-    // build report
-    const report = buildInsightReport(filled);
-
-    // show top strengths
-    resultBox.innerHTML = "";
-    const title = document.createElement("h3");
-    title.textContent = "Your Trait Summary";
-    resultBox.appendChild(title);
-
-    const summary = document.createElement("p");
-    summary.textContent = report.summary;
-    resultBox.appendChild(summary);
-
-    const list = document.createElement("div");
-    list.style.display = "grid";
-    list.style.gridTemplateColumns = "repeat(2, 1fr)";
-    list.style.gap = "8px";
-
-    report.detailedInsights.forEach(d => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.style.padding = "10px";
-      card.innerHTML = `<strong>${d.trait}</strong> — ${d.level} <div style="font-size:13px;color:var(--text-muted);margin-top:6px">${d.text}</div>`;
-      list.appendChild(card);
-    });
-
-    resultBox.appendChild(list);
-    if (incompleteNotice) {
-      const noteWrap = document.createElement('div');
-      noteWrap.innerHTML = incompleteNotice;
-      resultBox.insertBefore(noteWrap, resultBox.firstChild);
-    }
-    // motivational summary
-    const topTraits = Object.entries(filled).sort((a,b)=>b[1]-a[1]).slice(0,3);
-    const mot = document.createElement('div');
-    mot.style.marginTop = '12px';
-    mot.className = 'card';
-    const traitNames = topTraits.map(t=>t[0]).join(', ');
-    const celebExamples = topTraits.map(t => (CELEBRITY_MAP[t[0]] || []).slice(0,2).join(', ') || 'role models').join(' • ');
-    mot.innerHTML = `<strong>Great progress.</strong> Your top traits are <em>${traitNames}</em>. Keep building on these strengths — many high performers, e.g. ${celebExamples}, display similar strengths.`;
-    resultBox.appendChild(mot);
-
-    // radar chart for visual appeal
-    const canvasWrap = document.createElement('div');
-    canvasWrap.style.height = '260px';
-    canvasWrap.style.marginTop = '12px';
-    canvasWrap.innerHTML = `<canvas id="resultRadar"></canvas>`;
-    resultBox.appendChild(canvasWrap);
-    try {
-      const ChartLib = window.Chart;
-      if (ChartLib) {
-        const ctx = document.getElementById('resultRadar').getContext('2d');
-        const labels = Object.keys(filled);
-        const data = labels.map(l => filled[l] || 0);
-        new ChartLib(ctx, {
-          type: 'radar',
-          data: { labels, datasets: [{ label: 'Trait profile', data, backgroundColor: 'rgba(99,102,241,0.15)', borderColor: 'rgba(99,102,241,1)', pointBackgroundColor: 'rgba(99,102,241,1)' }] },
-          options: { scales: { r: { suggestedMin: 0, suggestedMax: 100 } }, plugins: { legend: { display: false } }, elements: { line: { tension: 0.2 } } }
-        });
+    radio.addEventListener("change", () => {
+      saveAnswer(q.id, i);
+      if (AUTO_ADVANCE) {
+        autoScrollNextQuestion(wrap, container);
       }
-    } catch (e) { console.warn('Radar render failed', e); }
-
-    // feedback form
-    const fb = document.createElement('div');
-    fb.style.marginTop = '12px';
-    fb.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <label style="font-weight:600">Share feedback about your results</label>
-        <textarea id="minddesk_feedback_text" rows="3" style="width:100%;padding:8px" placeholder="What do you think about these insights?"></textarea>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button id="minddesk_feedback_submit" class="primary-btn">Send feedback</button>
-        </div>
-      </div>
-    `;
-    resultBox.appendChild(fb);
-
-    document.getElementById('minddesk_feedback_submit')?.addEventListener('click', () => {
-      const text = document.getElementById('minddesk_feedback_text')?.value || '';
-      const storageKey = 'minddesk_feedback';
-      try {
-        const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        arr.push({ timestamp: new Date().toISOString(), topTraits: topTraits.map(t=>t[0]), text });
-        localStorage.setItem(storageKey, JSON.stringify(arr));
-        alert('Thanks for your feedback — it helps improve your experience.');
-      } catch (e) { alert('Failed to save feedback locally.'); }
     });
-    // clear autosave after submit
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-  });
 
-  clear.addEventListener("click", () => {
-    // clear stored answers and visually reset option buttons
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-    form.querySelectorAll("button.option-btn").forEach(b => {
-      const dot = b.querySelector('.fake-radio');
-      if (dot) dot.style.background = 'transparent';
-      b.setAttribute('aria-pressed', 'false');
-    });
-    resultBox.innerHTML = "";
-    bar.style.width = '0%';
-  });
+    const text = document.createElement("span");
+    text.textContent = i;
 
-  container.appendChild(form);
+    label.appendChild(radio);
+    label.appendChild(text);
+    scale.appendChild(label);
+  }
 
-  // initial render of first page
-  renderPage(page);
-  // listen for answer changes to update progress UI
-  window.addEventListener('minddesk_answers_changed', saveAnswersAutosave);
+  wrap.appendChild(legend);
+  wrap.appendChild(scale);
+  return wrap;
 }
+
+/* ============================================================
+   AUTO-SCROLL LOGIC
+============================================================ */
+
+function autoScrollNextQuestion(currentQuestion, container) {
+  const next = currentQuestion.nextElementSibling;
+
+  if (next) {
+    next.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  } else {
+    // End of page → move to next page if complete
+    if (pageCompleted(currentPage)) {
+      setTimeout(() => slideToNextPage(container), 300);
+    }
+  }
+}
+
+/* ============================================================
+   SLIDE ANIMATION BETWEEN PAGES
+============================================================ */
+
+function slideToNextPage(container) {
+  const pageWrap = container.querySelector("#pageWrap");
+
+  // If animations disabled, advance instantly
+  if (!ANIMATE_PAGES) {
+    if (currentPage < totalPages() - 1) {
+      currentPage++;
+      sessionStorage.setItem(PAGE_KEY, currentPage);
+      renderPage(container, "right");
+    } else {
+      submitTest(container);
+    }
+    try { container.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+    return;
+  }
+
+  // If the animated wrapper exists, play the slide animation
+  if (pageWrap) {
+    pageWrap.style.transition = "transform 0.35s ease, opacity 0.35s ease";
+    pageWrap.style.transform = "translateX(-40px)";
+    pageWrap.style.opacity = "0";
+
+    setTimeout(() => {
+      if (currentPage < totalPages() - 1) {
+        currentPage++;
+        sessionStorage.setItem(PAGE_KEY, currentPage);
+        renderPage(container, "right");
+      } else {
+        submitTest(container);
+      }
+      try { container.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+    }, 350);
+    return;
+  }
+
+  // Fallback: no wrapper found — just advance
+  if (currentPage < totalPages() - 1) {
+    currentPage++;
+    sessionStorage.setItem(PAGE_KEY, currentPage);
+    renderPage(container, "right");
+  } else {
+    submitTest(container);
+  }
+  try { container.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+}
+
+/* ============================================================
+   RENDER PAGE (SLIDE IN)
+============================================================ */
+
+function renderPage(container, direction = "right") {
+  const pageWrap = container.querySelector("#pageWrap");
+
+  pageWrap.innerHTML = "";
+  if (ANIMATE_PAGES) {
+    pageWrap.style.transition = "none";
+    pageWrap.style.opacity = "0";
+    pageWrap.style.transform =
+      direction === "right" ? "translateX(40px)" : "translateX(-40px)";
+  }
+
+  pageQuestions(currentPage).forEach((q, idx) => {
+    pageWrap.appendChild(createQuestion(q, idx, container));
+  });
+
+  document.getElementById("personalityPageIndicator").textContent =
+    `Page ${currentPage + 1} of ${totalPages()}`;
+
+  const prev = container.querySelector("#btnPrev");
+  const next = container.querySelector("#btnNext");
+  const submit = container.querySelector("#btnSubmit");
+
+  prev.disabled = currentPage === 0;
+
+  if (currentPage < totalPages() - 1) {
+    next.style.display = "inline-flex";
+    submit.style.display = "none";
+  } else {
+    next.style.display = "none";
+    submit.style.display = "inline-flex";
+  }
+
+  if (ANIMATE_PAGES) {
+    requestAnimationFrame(() => {
+      pageWrap.style.transition = "transform 0.35s ease, opacity 0.35s ease";
+      pageWrap.style.opacity = "1";
+      pageWrap.style.transform = "translateX(0)";
+    });
+  }
+
+  updateProgress();
+}
+
+/* ============================================================
+   FINAL SUBMIT
+============================================================ */
+
+function submitTest(container) {
+  const result = container.querySelector("#personalityResult");
+
+  const answered = Object.entries(answersCache).map(([id, value]) => ({
+    id: Number(id),
+    value
+  }));
+
+  const scores = calculateScores(answered, QUESTIONS);
+  const filled = fillMissingScores(scores, 50);
+
+  saveScoreSnapshot(filled);
+  saveInsightSnapshot(filled);
+
+  const report = buildInsightReport(filled);
+
+  result.innerHTML = `
+    <h3>Your Personality Summary</h3>
+    <p>${report.summary}</p>
+  `;
+
+  report.detailedInsights.forEach(d => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.marginTop = "8px";
+    card.innerHTML =
+      `<strong>${d.trait}</strong> — ${d.level}<br/><small>${d.text}</small>`;
+    result.appendChild(card);
+  });
+
+  localStorage.removeItem(STORAGE_KEY);
+  sessionStorage.removeItem(PAGE_KEY);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
 
 export function initPersonality() {
   const container = document.getElementById(APP_ID);
   if (!container) return;
 
-  // Render
-  try {
-    renderForm(container);
-  } catch (e) {
-    container.innerHTML = `<div class="card" style="background:#fff6f6;color:#b91c1c">Failed to load questions.</div>`;
-    console.error(e);
-  }
+  answersCache = loadAnswers();
+  currentPage = Number(sessionStorage.getItem(PAGE_KEY)) || 0;
+
+  container.innerHTML = "";
+
+  const intro = document.createElement("p");
+  intro.className = "subtitle";
+  intro.textContent = "Rate each statement from 1 (Low) to 5 (High).";
+
+  const progress = createProgressBar();
+  const indicator = createPageIndicator();
+
+  const pageWrap = document.createElement("div");
+  pageWrap.id = "pageWrap";
+  pageWrap.style.display = "grid";
+  pageWrap.style.gap = "20px";
+  pageWrap.style.overflow = "visible";
+  pageWrap.style.paddingBottom = "96px"; // space so last question clears sticky buttons
+
+  const actions = document.createElement("div");
+  actions.style.display = "flex";
+  actions.style.justifyContent = "space-between";
+  actions.style.marginTop = "12px";
+  // Keep controls visible
+  actions.style.position = "sticky";
+  actions.style.bottom = "0";
+  actions.style.padding = "10px 0 0 0";
+  actions.style.background = "linear-gradient(to bottom, transparent, var(--surface))";
+  actions.style.borderTop = "1px solid var(--border)";
+  actions.style.zIndex = "10001";
+  actions.style.pointerEvents = "auto";
+
+  const btnPrev = document.createElement("button");
+  btnPrev.id = "btnPrev";
+  btnPrev.textContent = "Previous";
+  btnPrev.type = "button";
+
+  const btnNext = document.createElement("button");
+  btnNext.id = "btnNext";
+  btnNext.textContent = "Next";
+  btnNext.type = "button";
+
+  const btnSubmit = document.createElement("button");
+  btnSubmit.id = "btnSubmit";
+  btnSubmit.textContent = "Submit Test";
+  btnSubmit.style.display = "none";
+  btnSubmit.type = "button";
+
+  btnPrev.addEventListener("click", () => {
+    if (currentPage > 0) {
+      currentPage--;
+      sessionStorage.setItem(PAGE_KEY, currentPage);
+      renderPage(container, "left");
+    }
+  });
+
+  btnNext.addEventListener("click", () => {
+    // Proceed even if the page isn't fully completed
+    slideToNextPage(container);
+  });
+
+  btnSubmit.addEventListener("click", () => submitTest(container));
+
+  actions.append(btnPrev, btnNext, btnSubmit);
+
+  const result = document.createElement("div");
+  result.id = "personalityResult";
+  result.style.marginTop = "16px";
+
+  container.append(
+    intro,
+    progress,
+    indicator,
+    pageWrap,
+    actions,
+    result
+  );
+
+  renderPage(container);
+  updateProgress();
+
+  // Keyboard shortcut: Enter to go Next
+  container.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      btnNext.click();
+    }
+  });
+
+  // Safety net: event delegation if direct handlers are ever lost
+  container.addEventListener('click', (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement)) return;
+    const id = t.id;
+    if (id === 'btnNext') { e.preventDefault(); slideToNextPage(container); }
+    if (id === 'btnPrev') { e.preventDefault(); if (currentPage>0){ currentPage--; sessionStorage.setItem(PAGE_KEY, currentPage); renderPage(container, 'left'); } }
+    if (id === 'btnSubmit') { e.preventDefault(); submitTest(container); }
+  });
 }
 
-// local helper used by app.js
 export default { initPersonality };
