@@ -100,7 +100,15 @@ if (page === "dashboard") {
       if (!bg) {
         bg = document.createElement('div');
         bg.className = 'bg-effects';
+        // keep it visually behind and non-interactive
+        bg.style.position = 'fixed';
+        bg.style.inset = '0';
+        bg.style.zIndex = '0';
+        bg.style.pointerEvents = 'none';
         document.body.appendChild(bg);
+      } else {
+        // enforce safety on existing node as well
+        bg.style.pointerEvents = 'none';
       }
       return bg;
     }
@@ -108,6 +116,11 @@ if (page === "dashboard") {
     function applyBlings(theme) {
       try {
         const container = ensureBgEffects();
+        // Do not render any blings on the dashboard Games page
+        if (document.getElementById('games')) {
+          container.querySelectorAll('.bling')?.forEach(n=>n.remove());
+          return;
+        }
         // respect user preference
         const enabled = localStorage.getItem('minddesk_blings_enabled');
         if (enabled === '0') {
@@ -123,6 +136,7 @@ if (page === "dashboard") {
         for (let i=0;i<count;i++){
           const b = document.createElement('div');
           b.className = 'bling';
+          b.style.pointerEvents = 'none';
           // size classes
           const sz = i % 3 === 0 ? 'medium' : (i % 2 === 0 ? 'small' : 'floaty');
           b.classList.add(sz);
@@ -214,6 +228,12 @@ if (page === "dashboard") {
         });
       }
     } catch (e) { /* ignore */ }
+
+    // Ensure no floating characters appear on dashboard (prevents flicker over buttons)
+    try {
+      const fc = document.getElementById('floatingChars');
+      if (fc) { fc.style.display = 'none'; while (fc.firstChild) fc.removeChild(fc.firstChild); }
+    } catch(e) { /* ignore */ }
 
     // Theme detective: suggest a theme based on dominant trait
     try {

@@ -64,13 +64,35 @@
        MAIN CONTENT
   ========================== -->
   <main class="content">
-    <div id="floatingChars" class="floating-chars" aria-hidden="true"></div>
+    
     <button id="sidePanelToggle" title="Open insights panel" style="position:absolute;right:18px;top:18px;z-index:40;">Insights ▸</button>
 
     <!-- ===== DASHBOARD ===== -->
     <section id="home" class="section">
-      <h1 id="greeting">Welcome</h1>
-      <p class="subtitle">Analytics overview of your personality</p>
+      <div id="logoHero" style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="hero_grad" x1="0" x2="1">
+              <stop offset="0" stop-color="#8b5cf6"/>
+              <stop offset="1" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+          <g>
+            <ellipse cx="20" cy="20" rx="18" ry="14" fill="url(#hero_grad)" />
+            <g transform="translate(8,12)">
+              <circle cx="6" cy="6" r="3.2" fill="#fff" />
+              <circle cx="6" cy="6" r="1.2" fill="#0f172a" />
+              <circle cx="14" cy="6" r="3.2" fill="#fff" />
+              <circle cx="14" cy="6" r="1.2" fill="#0f172a" />
+            </g>
+            <path d="M10 26 C14 30, 22 30, 26 26" stroke="#061826" stroke-width="1.6" fill="transparent" stroke-linecap="round"/>
+          </g>
+        </svg>
+        <div>
+          <h1 id="greeting" style="margin:0">Welcome</h1>
+          <div class="subtitle">Analytics overview and aptitude performance</div>
+        </div>
+      </div>
 
       <div class="cards">
         <div class="card">
@@ -86,29 +108,41 @@
           <p class="metric">Stable</p>
         </div>
       </div>
+
+      <div class="cards" style="margin-top:12px">
+        <div class="card" style="flex:1;min-width:260px">
+          <h3 style="margin:0 0 8px 0">Aptitude Summary</h3>
+          <canvas id="aptPie" height="160"></canvas>
+        </div>
+        <div class="card" style="flex:1;min-width:260px">
+          <h3 style="margin:0 0 8px 0">Accuracy by Topic</h3>
+          <canvas id="aptRadar" height="160"></canvas>
+        </div>
+      </div>
     </section>
 
     <!-- ===== ABOUT ===== -->
     <section id="about" class="section" style="display:none">
       <h2>About MindDesk</h2>
-      <p class="subtitle">MindDesk is a lightweight psychometric analytics demo showing trait scoring and trends based on user responses.</p>
+      <p class="subtitle">Aptitude practice and psychometric insights in a single, lightweight dashboard.</p>
 
       <div class="card">
-        <h3>Application</h3>
-        <p>Use the Personality test to answer reflective questions. Scores are computed across multiple traits and shown in the Insights section. Data persists to your browser's localStorage.</p>
-
-        <h3 style="margin-top:12px">Famous Figures & Related Traits</h3>
-        <p>Examples of public figures often associated with these traits (for inspiration):</p>
+        <h3>What it does</h3>
         <ul>
-          <li><strong>Vision:</strong> Steve Jobs, Elon Musk</li>
-          <li><strong>Drive:</strong> Serena Williams, Elon Musk</li>
-          <li><strong>Creativity:</strong> Leonardo da Vinci, Marie Curie</li>
-          <li><strong>Leadership:</strong> Nelson Mandela, Angela Merkel</li>
-          <li><strong>Ethics:</strong> Mahatma Gandhi, Malala Yousafzai</li>
+          <li>Personality: take assessments and view trait trends.</li>
+          <li>Aptitude: practice topic-wise interview questions with scoring and streaks.</li>
+          <li>Insights: charts for performance and accuracy by topic.</li>
         </ul>
 
-        <h3 style="margin-top:12px">About Us</h3>
-        <p>MindDesk is a demo project for psychometric insights and analytics. It is frontend-only and stores data locally. For production use, integrate with a secure backend and proper data practices.</p>
+        <h3 style="margin-top:12px">How data is stored</h3>
+        <p>All data is stored locally in your browser (localStorage). No server is required.</p>
+
+        <h3 style="margin-top:12px">Getting started</h3>
+        <ul>
+          <li>Go to Games → select a topic → Start → answer 20 MCQs.</li>
+          <li>Check the Aptitude Summary charts on the Dashboard.</li>
+          <li>Open Insights for deeper trait analytics.</li>
+        </ul>
       </div>
     </section>
 

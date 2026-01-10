@@ -1,5 +1,13 @@
 // Interactive brain logo and floating characters
 (function(){
+  // Hard disable all brand animations/effects on the dashboard page
+  try {
+    if (document.body && document.body.dataset && document.body.dataset.page === 'dashboard') {
+      const fc = document.getElementById('floatingChars');
+      if (fc) fc.remove();
+      return; // stop executing the rest of this script on dashboard
+    }
+  } catch(_) {}
   // Logo pupil tracking and blink
   const svg = document.getElementById('minddesk_logo');
   if (!svg) return;
@@ -38,9 +46,13 @@
     setTimeout(()=> smile.style.transform = '', 250);
   });
 
-  // Floating characters: spawn a few brains that animate across the UI
+  // Floating characters: disabled on dashboard to avoid distractions/flicker
   const container = document.getElementById('floatingChars');
   if (!container) return;
+  if (document.body && document.body.dataset && document.body.dataset.page === 'dashboard') {
+    try { container.style.display = 'none'; while (container.firstChild) container.removeChild(container.firstChild); } catch(_) {}
+    return;
+  }
 
   function spawnBrain(delay) {
     const el = document.createElement('div');

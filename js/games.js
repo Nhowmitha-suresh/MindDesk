@@ -54,6 +54,36 @@
       ]
     };
 
+  // Try initial render once the page and Chart.js are ready
+  setTimeout(()=>{ try { if (window.renderAptCharts) window.renderAptCharts(); } catch(_){} }, 400);
+
+  // Defensive: ensure no overlay blocks clicks in Games area
+  try{
+    if (!document.getElementById('aptClickSafe')){
+      const st=document.createElement('style');
+      st.id='aptClickSafe';
+      st.textContent = `#games, #games * { pointer-events:auto !important; }`;
+      document.head.appendChild(st);
+    }
+  }catch(_){}
+
+  // Global fallback delegation for Aptitude controls (non-capture, no preventDefault)
+  (function attachGlobalDelegation(){
+    let lock=false;
+    document.addEventListener('click', (ev)=>{
+      const target = ev.target.closest('#aptStart, #aptNext, #aptSubmit');
+      if (!target) return;
+      if (lock) return;
+      lock=true;
+      try{
+        if (target.id==='aptStart') { if (Aptitude && typeof Aptitude.begin==='function') Aptitude.begin(); }
+        else if (target.id==='aptNext') { if (Aptitude && typeof Aptitude.next==='function') Aptitude.next(); }
+        else if (target.id==='aptSubmit') { if (Aptitude && typeof Aptitude.submit==='function') Aptitude.submit(); }
+      } catch(err){ console.error('Apt delegation error', err); }
+      finally{ setTimeout(()=>lock=false, 200); }
+    }, false);
+  })();
+
     // Random utilities
     const ri = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
     const rf = (a,b,dp=0)=>Number((Math.random()*(b-a)+a).toFixed(dp));
@@ -82,9 +112,9 @@
       algebra: (n=40)=>{ const out=[]; for(let i=0;i<n;i++){ const x=ri(2,9), y=ri(1,9); const a1=ri(1,5), b1=ri(1,5), c1=a1*x+b1*y; const a2=ri(1,5), b2=ri(1,5), c2=a2*x+b2*y; const q=`Solve: ${a1}x+${b1}y=${c1}, ${a2}x+${b2}y=${c2}. Find x.`; const opts=[x, x+ri(1,3), Math.max(0,x-ri(1,3)), x+ri(4,6)].map(String); out.push({q,opts,ans:0}); } return out; },
       simplification: (n=40)=>{ const out=[]; for(let i=0;i<n;i++){ const a=ri(4,15), b=ri(2,5); const v=Math.round(Math.sqrt(a*a*b*b)); const q=`√(${a*a*b*b}) = ?`; const opts=[v, v+ri(1,4), Math.max(1,v-ri(1,4)), v+ri(5,9)].map(String); out.push({q,opts,ans:0}); } return out; },
       probability: (n=40)=>{ const out=[]; for(let i=0;i<n;i++){ const nCoins=choice([1,2,3]); const heads=1; const p = nCoins===1? '1/2' : nCoins===2? '1/2' : '3/8'; const q=`Probability of exactly one head when tossing ${nCoins} fair coin(s)`; const opts=[p,'1/3','1/4','2/3']; out.push({q,opts,ans:0}); } return out; },
-      di: (n=30)=>{ const out=[]; for(let i=0;i<n;i++){ const base=ri(100,500), inc=choice([10,15,20,25]); const val=base*(1+inc/100); const q=`A value rises from ${base} to ${Math.round(val)}. Percentage increase = ?`; const opts=[`${inc}%`, `${inc-5}%`, `${inc+5}%`, `${inc+10}%`]; out.push({q,opts,ans:0}); } return out; },
-      misc: (n=20)=>{ const out=[]; for(let i=0;i<n;i++){ const a=ri(2,9), b=ri(2,9), v=a*b; const q=`How many factors does ${v} have?`; const count=(n)=>{let c=0; for(let k=1;k*k<=n;k++){ if(n%k===0) c+=(k*k===n?1:2);} return c;}; const fc=count(v); const opts=[fc, fc+1, Math.max(1,fc-1), fc+2].map(String); out.push({q,opts,ans:0}); } return out; },
-      current: (n=30)=>{ const out=[]; const qa=[
+      di: (n=40)=>{ const out=[]; for(let i=0;i<n;i++){ const base=ri(100,500), inc=choice([10,15,20,25]); const val=base*(1+inc/100); const q=`A value rises from ${base} to ${Math.round(val)}. Percentage increase = ?`; const opts=[`${inc}%`, `${inc-5}%`, `${inc+5}%`, `${inc+10}%`]; out.push({q,opts,ans:0}); } return out; },
+      misc: (n=30)=>{ const out=[]; for(let i=0;i<n;i++){ const a=ri(2,9), b=ri(2,9), v=a*b; const q=`How many factors does ${v} have?`; const count=(n)=>{let c=0; for(let k=1;k*k<=n;k++){ if(n%k===0) c+=(k*k===n?1:2);} return c;}; const fc=count(v); const opts=[fc, fc+1, Math.max(1,fc-1), fc+2].map(String); out.push({q,opts,ans:0}); } return out; },
+      current: (n=40)=>{ const out=[]; const qa=[
         ['Currency of Japan', ['Won','Yen','Ringgit','Dollar'],1],
         ['Largest ocean', ['Indian','Arctic','Pacific','Atlantic'],2],
         ['Headquarters of UN', ['Geneva','New York','Vienna','Paris'],1]
@@ -141,11 +171,13 @@
     })();
 
     let order = [], idx = 0, selection = -1, timerId = 0, secs = 0, topic = 'number_systems';
+    let sessionCorrect = 0, sessionTotal = 0;
     const elQ = () => document.getElementById('aptQuestion');
     const elO = () => document.getElementById('aptOptions');
     const elT = () => document.getElementById('aptTimer');
     const elP = () => document.getElementById('aptProgress');
     const elF = () => document.getElementById('aptFeedback');
+    const elB = () => document.getElementById('aptBoard');
 
     function tick(){ secs++; const m=String(Math.floor(secs/60)).padStart(2,'0'); const s=String(secs%60).padStart(2,'0'); elT().textContent = `⏱ ${m}:${s}`; }
     function startTimer(){ stopTimer(); secs=0; tick(); timerId = setInterval(tick,1000); }
@@ -165,11 +197,17 @@
       if (!pool.length){ elF().textContent='No questions in this topic yet.'; return; }
       order = shuffle(pool).slice(0, 20);
       idx = 0; selection = -1;
+      sessionCorrect = 0; sessionTotal = 0; updateBoard();
       document.getElementById('aptNext').disabled = true;
       document.getElementById('aptSubmit').disabled = true;
       elF().textContent='';
       render();
       startTimer();
+    }
+
+    const GC = () => (window.GameCore || { score: 0, riskMode: false, addScore: ()=>{} });
+    function updateBoard(){
+      const b = elB(); if (b) b.textContent = `Score: ${GC().score} • Correct: ${sessionCorrect}/${sessionTotal}`;
     }
 
     function render(){
@@ -180,21 +218,41 @@
       elO().innerHTML = '';
       cur.opts.forEach((t,i)=>{
         const b=document.createElement('button');
-        b.className='secondary'; b.type='button'; b.textContent = `${String.fromCharCode(65+i)}. ${t}`;
-        b.onclick=()=>{ selection=i; document.querySelectorAll('#aptOptions button').forEach(x=>x.classList.remove('primary-btn')); b.classList.add('primary-btn'); document.getElementById('aptSubmit').disabled=false; };
+        b.className='secondary';
+        b.type='button';
+        b.textContent = `${String.fromCharCode(65+i)}. ${t}`;
+        b.dataset.idx = String(i);
         elO().appendChild(b);
       });
+      // ensure options are enabled for a fresh question
+      document.querySelectorAll('#aptOptions button').forEach(btn=>btn.disabled=false);
+    }
+
+    function saveStats(topic, ok){
+      try{
+        const key='minddesk_apt_stats';
+        const data=JSON.parse(localStorage.getItem(key)||'{}');
+        const t=data[topic]||{correct:0,total:0};
+        t.total+=1; if(ok) t.correct+=1; data[topic]=t;
+        localStorage.setItem(key, JSON.stringify(data));
+      }catch(_){}
     }
 
     function submit(){
       const cur = order[idx];
       if (selection===-1) return;
       const ok = selection===cur.ans;
-      GameCore.addScore(ok? 10 : -5);
-      VoiceEngine.speak(ok? 'Correct' : 'Wrong', ok? 'happy':'warning');
-      elF().textContent = ok? `✅ Correct (+${GameCore.riskMode?20:10})` : '❌ Wrong (−5)';
+      GC().addScore(ok? 10 : -5);
+      try { window.VoiceEngine && window.VoiceEngine.speak && window.VoiceEngine.speak(ok? 'Correct' : 'Wrong', ok? 'happy':'warning'); } catch(_){ }
+      elF().textContent = ok? `✅ Correct (+${GC().riskMode?20:10})` : '❌ Wrong (−5)';
       document.getElementById('aptNext').disabled = false;
       document.getElementById('aptSubmit').disabled = true;
+      // update session stats
+      sessionTotal += 1; if (ok) sessionCorrect += 1; updateBoard();
+      // lock options until Next
+      document.querySelectorAll('#aptOptions button').forEach(btn=>btn.disabled=true);
+      saveStats(topic, ok);
+      try { if (window.renderAptCharts) window.renderAptCharts(); } catch(_) {}
     }
 
     function next(){ idx++; selection=-1; elF().textContent=''; document.getElementById('aptNext').disabled = true; render(); }
@@ -261,18 +319,138 @@
       const urlInput=document.getElementById('aptUrl');
       if (!startBtn||!nextBtn||!submitBtn||!topicSel) return;
       topicSel.addEventListener('change',()=>{ topic=topicSel.value; });
-      startBtn.addEventListener('click', begin);
-      nextBtn.addEventListener('click', next);
-      submitBtn.addEventListener('click', submit);
-      if (loadBtn) loadBtn.addEventListener('click', ()=>{ const u=urlInput.value.trim(); if(u) loadFromUrl(u); });
-      if (pasteBtn) pasteBtn.addEventListener('click', loadFromPaste);
-      if (sampleBtn) sampleBtn.addEventListener('click', loadSamplePack);
+      // Anti-flicker style injection
+      try{
+        if (!document.getElementById('aptAntiFlicker')){
+          const st=document.createElement('style');
+          st.id='aptAntiFlicker';
+          st.textContent = `
+            #games, #games * { animation: none !important; transition: none !important; }
+            #games .card:hover { transform: none !important; box-shadow: none !important; }
+            #games .card::after { opacity: 0 !important; }
+            #games button { backface-visibility: hidden; transform: translateZ(0); }
+            #games .primary-btn, #games .secondary { transition: none !important; }
+            #games button:hover { transform: none !important; }
+            #aptControls button { position: relative; z-index: 3; pointer-events: auto !important; }
+            /* Stable, accessible answer options */
+            #aptOptions { display: grid; gap: 10px; }
+            #aptOptions button { 
+              position: relative; z-index: 2; pointer-events: auto !important;
+              width: 100%; text-align: left; padding: 12px 14px; border-radius: 10px;
+              border: 1px solid var(--border); background: var(--surface); box-shadow: none !important;
+            }
+            #aptOptions button.primary-btn { border-color: var(--accent); }
+          `;
+          document.head.appendChild(st);
+        }
+      }catch(_){}
+
+      const safeOnClick = (el, handler) => {
+        if (!el) return;
+        let locked=false;
+        el.addEventListener('click', (e)=>{
+          if (locked) return;
+          locked=true;
+          try { handler(e); } finally { setTimeout(()=>locked=false, 250); }
+        });
+      };
+
+      // Ensure topic has a value
+      if (topicSel && !topicSel.value) topicSel.value = 'number_systems';
+
+      safeOnClick(startBtn, begin);
+      safeOnClick(nextBtn, next);
+      safeOnClick(submitBtn, submit);
+      // Hard fallback: assign direct onclick to avoid any third-party interference
+      if (startBtn && !startBtn.__onclickBound){ startBtn.__onclickBound=true; startBtn.onclick = (e)=>{ try{ e.preventDefault(); begin(); }catch(_){} }; }
+      if (loadBtn) safeOnClick(loadBtn, ()=>{ const u=urlInput.value.trim(); if(u) loadFromUrl(u); });
+      if (pasteBtn) safeOnClick(pasteBtn, loadFromPaste);
+      if (sampleBtn) safeOnClick(sampleBtn, loadSamplePack);
+
+      // Periodic rebind in case DOM was re-rendered
+      setInterval(()=>{
+        const s=document.getElementById('aptStart');
+        const n=document.getElementById('aptNext');
+        const u=document.getElementById('aptSubmit');
+        if (s && !s.__wired){ s.__wired=true; safeOnClick(s, begin); }
+        if (n && !n.__wired){ n.__wired=true; safeOnClick(n, next); }
+        if (u && !u.__wired){ u.__wired=true; safeOnClick(u, submit); }
+      }, 1000);
+
+      // Event delegation for option buttons to ensure clicks always register
+      let optBusy=false;
+      const optHandler = (e)=>{
+        if (optBusy) return;
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const idx = Array.from(document.querySelectorAll('#aptOptions button')).indexOf(btn);
+        if (idx>=0){
+          optBusy=true;
+          selection = idx;
+          document.querySelectorAll('#aptOptions button').forEach(x=>x.classList.remove('primary-btn'));
+          btn.classList.add('primary-btn');
+          document.getElementById('aptSubmit').disabled=false;
+          setTimeout(()=>{ optBusy=false; }, 150);
+        }
+      };
+      const optsEl = document.getElementById('aptOptions');
+      optsEl.addEventListener('click', optHandler);
+
+      // Keyboard shortcuts: 1-4 to select options, Enter to submit
+      document.addEventListener('keydown', (ev)=>{
+        if (ev.repeat) return; // prevent key repeat flicker
+        if (!document.body.contains(document.getElementById('aptQ'))) return;
+        if (['1','2','3','4'].includes(ev.key)){
+          const k = Number(ev.key)-1;
+          const btn = document.querySelectorAll('#aptOptions button')[k];
+          if (btn){ btn.click(); ev.preventDefault(); }
+        } else if (ev.key === 'Enter'){
+          if (!document.getElementById('aptSubmit').disabled){ submit(); ev.preventDefault(); }
+        }
+      });
     }
 
-    return { wire };
+    return { wire, begin, next, submit };
   })();
 
   Aptitude.wire();
+  // Global fallbacks for inline onclick
+  window.__aptStart = () => { try { if (Aptitude && typeof Aptitude.begin==='function') Aptitude.begin(); } catch(e){ console.warn('Start failed', e); } };
+  window.__aptSubmit = () => { try { if (Aptitude && typeof Aptitude.submit==='function') Aptitude.submit(); } catch(e){ console.warn('Submit failed', e); } };
+  window.__aptNext = () => { try { if (Aptitude && typeof Aptitude.next==='function') Aptitude.next(); } catch(e){ console.warn('Next failed', e); } };
+
+  // Optional charts on Dashboard for Aptitude stats
+  window.renderAptCharts = function(){
+    try {
+      const pie = document.getElementById('aptPie');
+      const radar = document.getElementById('aptRadar');
+      if (!pie && !radar) return;
+      const stats = JSON.parse(localStorage.getItem('minddesk_apt_stats')||'{}');
+      const topics = Object.keys(stats);
+      const correct = topics.map(t=>stats[t].correct||0);
+      const total = topics.map(t=>stats[t].total||0);
+      const incorrect = total.map((v,i)=>Math.max(0,v-correct[i]));
+      if (pie){
+        const ctx = pie.getContext('2d');
+        if (pie._chart) pie._chart.destroy();
+        pie._chart = new Chart(ctx, {
+          type: 'pie',
+          data: { labels: ['Correct','Incorrect'], datasets: [{ data: [correct.reduce((a,b)=>a+b,0), incorrect.reduce((a,b)=>a+b,0)], backgroundColor: ['#22c55e','#ef4444'] }] },
+          options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+      }
+      if (radar){
+        const ctx = radar.getContext('2d');
+        if (radar._chart) radar._chart.destroy();
+        const acc = topics.map((t,i)=> total[i] ? Math.round(correct[i]/total[i]*100) : 0);
+        radar._chart = new Chart(ctx, {
+          type: 'radar',
+          data: { labels: topics, datasets: [{ label: 'Accuracy %', data: acc, backgroundColor: 'rgba(99,102,241,0.2)', borderColor: '#6366f1' }] },
+          options: { responsive: true, scales: { r: { suggestedMin: 0, suggestedMax: 100 } } }
+        });
+      }
+    } catch(_){}
+  };
 /* ============================================================
    MindDesk – Unified Games Engine with AI Voice Narration
    Author: Nhowmitha Suresh
@@ -315,8 +493,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <option value="misc">Miscellaneous</option>
             <option value="current">Current Affairs</option>
           </select>
-          <button id="aptStart" class="primary-btn">Start</button>
-          <button id="aptNext" class="secondary" disabled>Next</button>
+          <button id="aptStart" class="primary-btn" onclick="window.__aptStart && window.__aptStart()">Start</button>
+          <button id="aptNext" class="secondary" disabled onclick="window.__aptNext && window.__aptNext()">Next</button>
           <input id="aptUrl" placeholder="Load JSON URL" style="flex:1;min-width:200px;padding:6px;border:1px solid var(--border);border-radius:6px" />
           <button id="aptLoadUrl" class="secondary" title="Load questions from URL">Load URL</button>
           <button id="aptPaste" class="secondary" title="Paste JSON">Paste</button>
@@ -325,12 +503,13 @@ document.addEventListener("DOMContentLoaded", () => {
         <div id="aptStatus" style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
           <div id="aptTimer">⏱ 00:00</div>
           <div id="aptProgress">Q 0/0</div>
+          <div id="aptBoard">Score: 0 • Correct: 0/0</div>
         </div>
         <div id="aptQ" class="card" style="padding:12px;background:var(--surface-muted)">
           <div id="aptQuestion" style="font-weight:600;margin-bottom:8px"></div>
           <div id="aptOptions" style="display:grid;gap:8px"></div>
           <div style="display:flex;gap:8px;margin-top:10px">
-            <button id="aptSubmit" class="primary-btn" disabled>Submit</button>
+            <button id="aptSubmit" class="primary-btn" disabled onclick="window.__aptSubmit && window.__aptSubmit()">Submit</button>
             <div id="aptFeedback" style="color:var(--text-muted)"></div>
           </div>
         </div>

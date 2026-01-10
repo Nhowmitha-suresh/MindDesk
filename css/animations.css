@@ -20,6 +20,12 @@
   }
 }
 
+/* Hard-disable motion on the dashboard page to prevent any flicker around Games */
+body[data-page="dashboard"] * {
+  animation: none !important;
+  transition: none !important;
+}
+
 /* -------------------------------
    PAGE LOAD ANIMATION
 -------------------------------- */
@@ -57,6 +63,8 @@
     transparent 60%
   );
   transition: opacity 200ms ease;
+  /* Important: never block clicks on interactive content inside cards */
+  pointer-events: none;
 }
 
 .card:hover::after {
@@ -317,8 +325,9 @@ html {
   100% { transform: scaleY(1); }
 }
 
-.floating-chars { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+.floating-chars { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; display: none !important; }
 .float-brain {
+  display: none !important;
   position: absolute;
   width: 36px;
   height: 36px;
@@ -342,7 +351,7 @@ html {
 -------------------------------- */
 .brain-char { width: 48px; height: 48px; display: block; }
 .float-brain { width: 48px; height: 48px; }
-.brain-bob { animation: brainBob 6s ease-in-out infinite; }
+.brain-bob { animation: none !important; }
 
 @keyframes brainBob {
   0% { transform: translateX(-8%) translateY(0) scale(0.92); opacity: 0; }

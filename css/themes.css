@@ -8,6 +8,8 @@
 ========================================================= */
 
 /* Background & pseudo elements must NEVER capture clicks */
+.app[data-page="dashboard"] .bg-effects,
+body[data-page="dashboard"] .bg-effects { display: none !important; }
 .bg-effects,
 .bg-effects::before,
 .bg-effects::after,
