@@ -1,0 +1,12 @@
+{
+  "number_systems": [
+    { "q": "Find the LCM of 12 and 18.", "opts": ["24","36","48","54"], "ans": 1 },
+    { "q": "What is 2^5?", "opts": ["16","32","64","48"], "ans": 1 }
+  ],
+  "arithmetic": [
+    { "q": "Evaluate 8 + 6 × 2 using BODMAS.", "opts": ["28","20","16","12"], "ans": 1 }
+  ],
+  "percentages": [
+    { "q": "Increase 200 by 15%.", "opts": ["215","220","230","245"], "ans": 2 }
+  ]
+}
