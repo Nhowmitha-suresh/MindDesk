@@ -449,6 +449,7 @@
           options: { responsive: true, scales: { r: { suggestedMin: 0, suggestedMax: 100 } } }
         });
       }
+      try { if (window.renderApt3D) window.renderApt3D(); } catch(_){}
     } catch(_){}
   };
 /* ============================================================

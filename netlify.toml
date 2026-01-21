@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+  command = ""
+
+[context.production.environment]
+  NODE_ENV = "production"
+
+[dev]
+  port = 3000

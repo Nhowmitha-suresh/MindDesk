@@ -105,3 +105,29 @@ Each game provides lightweight behavioral signals related to attention, impulse 
 ### Option 2: Using Python HTTP Server
 ```bash
 python -m http.server 5500
+```
+
+---
+
+## 🚀 Deployment (recommended)
+
+You can host this static site publicly so anyone with the link can use it. Two easy options:
+
+- GitHub Pages (CI-driven): push your repository to GitHub `main` branch. A GitHub Actions workflow is included at `.github/workflows/deploy.yml` which will deploy the site to GitHub Pages automatically on push to `main` or `master`.
+
+- Netlify / Vercel: connect your Git repository to Netlify or Vercel, and set the publish directory to the repository root (`/`). A sample `netlify.toml` is included for convenience.
+
+Steps (GitHub Pages):
+1. Create a GitHub repo and push this project.
+2. Ensure the repository's default branch is `main` (or `master`).
+3. The included workflow will run and publish to GitHub Pages; after the action completes your site will be available at `https://<your-username>.github.io/<repo-name>/`.
+
+Steps (Netlify):
+1. Sign in to Netlify and choose "New site from Git".
+2. Connect your Git provider and select the repository.
+3. Set build command to blank and publish directory to `/` (root).
+4. Deploy — Netlify will give you a public URL.
+
+Notes:
+- All app data is stored in the browser (LocalStorage). Users share the same code and UI via the public URL, but their data remains local and private unless they export it.
+- If you want dynamic multi-user data, you'll need to add a backend (API + DB). I can help scaffold one if you'd like.
