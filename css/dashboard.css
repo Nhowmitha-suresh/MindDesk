@@ -242,11 +242,11 @@ canvas {
 .info-card {
   background: var(--surface);
   border-radius: 12px;
-  padding: 12px;
+  padding: 14px 14px 16px 14px;
   box-shadow: var(--shadow-sm);
   color: var(--text);
 }
-.info-card h4 { margin:0 0 8px 0; font-size:15px }
+.info-card h4 { margin:0 0 8px 0; font-size:15px; color:var(--accent); }
 .info-card p { margin:0 0 8px 0; color:var(--text-muted); font-size:13px }
 
 .mascot {
@@ -260,7 +260,32 @@ canvas {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
 }
-.mascot .bubble {
+.mascot svg { width:72px; height:72px; display:block }
+
+/* Entrance animation */
+.mascot.animate-enter { transform: translateY(-18px) scale(0.6); opacity:0; animation: mascotEntrance 520ms cubic-bezier(.2,.9,.3,1) forwards; }
+@keyframes mascotEntrance { to { transform: translateY(0) scale(1); opacity:1; } }
+
+/* Blink animation for eyes (scaleY) */
+.mascot .eye { transform-origin: center; transition: transform 140ms ease; }
+.mascot.blink .eye { transform: scaleY(0.12); }
+
+/* Cheer pulse */
+.mascot.cheer { animation: mascotCheer 560ms ease; }
+@keyframes mascotCheer { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+/* Sad / thinking expression */
+.mascot.sad .mouth { transform: translateY(2px) scaleY(0.8); }
+.mascot.happy .mouth { transform: translateY(-2px) scaleY(1.05); }
+.mascot .mouth { transition: transform 160ms ease; transform-origin: center; }
+
+.mascot-wrap .bubble { right: -6px; top: -12px; left: auto; max-width:200px; text-align:left }
+.mascot-wrap .bubble.show { animation: bubblePop 260ms ease forwards; }
+@keyframes bubblePop { from { transform: scale(0.9); opacity:0 } to { transform: scale(1); opacity:1 } }
+
+/* compact label inside pie wrapper */
+.apt-center { left: 50% !important; top: 50% !important; transform: translate(-50%,-50%); font-size:14px; opacity:0.98 }
+.mascot-wrap .bubble {
   position: absolute;
   right: 14px;
   top: -6px;

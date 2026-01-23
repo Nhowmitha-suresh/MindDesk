@@ -953,8 +953,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (delta > 0) {
         const text = state.streak && state.streak % 3 === 0 ? `Streak ${state.streak}!` : `+${delta} points`;
         bubble.textContent = cheers[Math.floor(Math.random()*cheers.length)].replace('+1', `+${delta}`) + ' ' + text;
+        // trigger cheer animation briefly
+        masc.classList.remove('sad'); masc.classList.add('happy','cheer');
+        setTimeout(()=>{ masc.classList.remove('cheer'); }, 700);
       } else if (delta < 0) {
         bubble.textContent = hurts[Math.floor(Math.random()*hurts.length)];
+        masc.classList.add('sad');
       }
       if (state.streak !== prevStreak && state.streak > prevStreak) {
         bubble.textContent = `Streak x${state.streak}! Keep going!`;
@@ -965,8 +969,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     masc.addEventListener('click', ()=>{
-      bubble.textContent = ['You got this!','Try a quick 10-min drill','Focus on one topic today'][Math.floor(Math.random()*3)];
+      const tips = ['You got this!','Try a quick 10-min drill','Focus on one topic today'];
+      bubble.textContent = tips[Math.floor(Math.random()*tips.length)];
+      masc.classList.add('cheer');
+      setTimeout(()=>masc.classList.remove('cheer'),600);
     });
+
+    // Blinking behavior: random blink every 2-6s
+    const eyeL = document.getElementById('eyeL');
+    const eyeR = document.getElementById('eyeR');
+    function blink(){
+      masc.classList.add('blink');
+      setTimeout(()=>masc.classList.remove('blink'),140);
+    }
+    let blinkTimer = setInterval(blink, 2500 + Math.random()*3000);
+    // entrance: remove animate-enter after it finishes so further transforms work
+    setTimeout(()=>{ masc.classList.remove('animate-enter'); }, 700);
+    // cleanup on unload
+    window.addEventListener('beforeunload', ()=>{ clearInterval(blinkTimer); });
   })();
 
   /* ============================================================

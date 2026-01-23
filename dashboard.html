@@ -149,20 +149,22 @@
                 <p>Short practice sessions draw questions from topic banks, track accuracy and adapt difficulty.</p>
               </div>
               <div class="mascot-wrap">
-                <div class="mascot" id="mascot"> 
-                  <!-- simple friendly cat mascot (original SVG) -->
+                <div class="mascot animate-enter" id="mascot"> 
+                  <!-- friendly cat mascot with identifiable parts for animation -->
                   <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <defs>
                       <linearGradient id="mgrad" x1="0" x2="1"><stop offset="0" stop-color="#ffd37a"/><stop offset="1" stop-color="#ffb36b"/></linearGradient>
                     </defs>
                     <g>
                       <circle cx="32" cy="32" r="30" fill="url(#mgrad)" />
-                      <path d="M20 28 Q24 18 32 20 Q40 18 44 28 Q48 34 36 38 Q32 40 28 38 Q16 34 20 28" fill="#fff" opacity="0.95" />
-                      <circle cx="24" cy="28" r="4" fill="#1f2937" />
-                      <circle cx="40" cy="28" r="4" fill="#1f2937" />
-                      <path d="M28 36 Q32 40 36 36" stroke="#1f2937" stroke-width="2" fill="none" stroke-linecap="round"/>
-                      <path d="M18 14 Q24 6 30 12" stroke="#1f2937" stroke-width="1.6" fill="none"/>
-                      <path d="M46 14 Q40 6 34 12" stroke="#1f2937" stroke-width="1.6" fill="none"/>
+                      <path id="faceMask" d="M20 28 Q24 18 32 20 Q40 18 44 28 Q48 34 36 38 Q32 40 28 38 Q16 34 20 28" fill="#fff" opacity="0.95" />
+                      <g id="eyesGroup">
+                        <ellipse id="eyeL" class="eye" cx="24" cy="28" rx="4" ry="4" fill="#1f2937" />
+                        <ellipse id="eyeR" class="eye" cx="40" cy="28" rx="4" ry="4" fill="#1f2937" />
+                      </g>
+                      <path id="mouth" class="mouth" d="M28 36 Q32 40 36 36" stroke="#1f2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      <path id="earL" d="M18 14 Q24 6 30 12" stroke="#1f2937" stroke-width="1.6" fill="none"/>
+                      <path id="earR" d="M46 14 Q40 6 34 12" stroke="#1f2937" stroke-width="1.6" fill="none"/>
                     </g>
                   </svg>
                 </div>
