@@ -40,10 +40,14 @@ navItems.forEach(item => {
 /* Initial load */
 document.addEventListener("DOMContentLoaded", () => {
   hideAll();
-  show("home");
+  // Check URL param `start` to show a specific section after login
+  const params = new URLSearchParams(window.location.search);
+  const start = params.get('start') || 'home';
+  show(start);
   // hide floating characters initially
   const float = document.getElementById('floatingChars'); if (float) float.style.display = 'none';
-  // mark default active nav
-  const first = document.querySelector('[data-target="home"]');
+  // mark active nav for the start section
+  navItems.forEach(i => i.classList.remove('active'));
+  const first = document.querySelector('[data-target="' + start + '"]') || document.querySelector('[data-target="home"]');
   if (first) first.classList.add('active');
 });

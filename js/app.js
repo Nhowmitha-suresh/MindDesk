@@ -37,7 +37,7 @@ if (page === "auth") {
       return;
     }
 
-    window.location.href = "dashboard.html";
+    window.location.href = "dashboard.html?start=about";
   });
 
   /* Handle Signup */
@@ -56,7 +56,7 @@ if (page === "auth") {
       return;
     }
 
-    window.location.href = "dashboard.html";
+    window.location.href = "dashboard.html?start=about";
   });
 }
 

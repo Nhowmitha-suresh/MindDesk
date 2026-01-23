@@ -127,27 +127,118 @@
 
     <!-- ===== ABOUT ===== -->
     <section id="about" class="section" style="display:none">
-      <h2>About MindDesk</h2>
-      <p class="subtitle">Aptitude practice and psychometric insights in a single, lightweight dashboard.</p>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="flex:1;min-width:260px">
+          <h2 style="margin:0 0 6px 0">About MindDesk</h2>
+          <p class="subtitle" style="margin-bottom:8px">Aptitude practice and psychometric insights in a single, lightweight dashboard — designed for learners and interview prep.</p>
+          <div class="card" style="padding:12px;">
+            <h3 style="margin-top:0">Overview</h3>
+            <ul>
+              <li>Personality: assessments with trait trends and practical tips.</li>
+              <li>Aptitude: topic-wise practice tests (Easy / Medium / Hard) with scoring and streaks.</li>
+              <li>Insights: accuracy by topic, history charts, and downloadable CSV.</li>
+            </ul>
 
-      <div class="card">
-        <h3>What it does</h3>
-        <ul>
-          <li>Personality: take assessments and view trait trends.</li>
-          <li>Aptitude: practice topic-wise interview questions with scoring and streaks.</li>
-          <li>Insights: charts for performance and accuracy by topic.</li>
-        </ul>
+            <h3 style="margin-top:12px">Privacy & Storage</h3>
+            <p>All data remains on your device in `localStorage` for privacy and instant access. Export your results anytime.</p>
 
-        <h3 style="margin-top:12px">How data is stored</h3>
-        <p>All data is stored locally in your browser (localStorage). No server is required.</p>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button id="aboutToGames" class="primary-btn">Go to Games (Aptitude)</button>
+              <button id="aboutToPersonality" class="secondary">Take Personality Test</button>
+              <button id="aboutDownloadData" class="secondary">Export Data</button>
+            </div>
+          </div>
+        </div>
 
-        <h3 style="margin-top:12px">Getting started</h3>
-        <ul>
-          <li>Go to Games → select a topic → Start → answer 20 MCQs.</li>
-          <li>Check the Aptitude Summary charts on the Dashboard.</li>
-          <li>Open Insights for deeper trait analytics.</li>
-        </ul>
+        <div style="width:380px;min-width:260px">
+          <div class="card" style="padding:12px">
+            <h3 style="margin-top:0">Quick Practice</h3>
+            <p class="subtitle" style="margin:4px 0 10px 0">Start a short practice tailored to your level.</p>
+
+            <label style="display:block;margin-bottom:8px">Topic
+              <select id="aboutAptTopic" style="width:100%;padding:8px;margin-top:6px;border:1px solid var(--border);border-radius:6px">
+                <option value="number_systems">Number Systems</option>
+                <option value="arithmetic">Arithmetic Fundamentals</option>
+                <option value="percentages">Percentages & Profit–Loss</option>
+                <option value="interest">Interest</option>
+                <option value="ratio">Ratio & Proportion</option>
+                <option value="time_work">Time & Work</option>
+                <option value="time_distance">Time & Distance</option>
+                <option value="mensuration">Mensuration</option>
+                <option value="di">Data Interpretation</option>
+                <option value="algebra">Algebra</option>
+                <option value="simplification">Simplification</option>
+                <option value="probability">Probability</option>
+                <option value="misc">Miscellaneous</option>
+                <option value="current">Current Affairs</option>
+              </select>
+            </label>
+
+            <div style="margin:8px 0">
+              <div style="font-weight:600;margin-bottom:6px">Difficulty</div>
+              <label style="display:inline-flex;align-items:center;gap:8px"><input type="radio" name="aboutAptLevel" value="easy" checked/> Easy</label>
+              <label style="display:inline-flex;align-items:center;gap:8px;margin-left:10px"><input type="radio" name="aboutAptLevel" value="medium"/> Medium</label>
+              <label style="display:inline-flex;align-items:center;gap:8px;margin-left:10px"><input type="radio" name="aboutAptLevel" value="hard"/> Hard</label>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button id="aboutStartPractice" class="primary-btn">Start Practice</button>
+              <button id="aboutStartFull" class="secondary">Open Full Games</button>
+            </div>
+
+            <div id="aboutPracticeHint" style="margin-top:10px;color:var(--text-muted);font-size:13px">Easy: 10 Qs • Medium: 20 Qs • Hard: 30 Qs</div>
+          </div>
+        </div>
       </div>
+
+      <script>
+        (function(){
+          const gotoGames = document.getElementById('aboutToGames');
+          const gotoPerson = document.getElementById('aboutToPersonality');
+          const download = document.getElementById('aboutDownloadData');
+          const start = document.getElementById('aboutStartPractice');
+          const startFull = document.getElementById('aboutStartFull');
+
+          gotoGames?.addEventListener('click', ()=>{
+            document.querySelector('[data-target="games"]')?.click();
+          });
+          gotoPerson?.addEventListener('click', ()=>{
+            document.querySelector('[data-target="personality"]')?.click();
+          });
+          download?.addEventListener('click', ()=>{
+            try{
+              const data = {
+                users: JSON.parse(localStorage.getItem('minddesk_users')||'[]'),
+                scores: JSON.parse(localStorage.getItem('minddesk_scores')||'{}'),
+                apt_stats: JSON.parse(localStorage.getItem('minddesk_apt_stats')||'{}')
+              };
+              const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a'); a.href=url; a.download='minddesk_export.json'; a.click(); URL.revokeObjectURL(url);
+            }catch(e){ alert('Export failed'); }
+          });
+
+          function mapLevelToCount(level){ return level === 'easy' ? 10 : level === 'hard' ? 30 : 20; }
+
+          start?.addEventListener('click', ()=>{
+            const topic = document.getElementById('aboutAptTopic')?.value || 'number_systems';
+            const level = document.querySelector('input[name="aboutAptLevel"]:checked')?.value || 'medium';
+            // store desired question count for Aptitude module
+            localStorage.setItem('minddesk_apt_qcount', String(mapLevelToCount(level)));
+            // set the topic selector in the Games Aptitude controls (if present)
+            const sel = document.getElementById('aptTopic') || document.getElementById('aboutAptTopic');
+            if (sel) sel.value = topic;
+            // navigate to Games and start
+            document.querySelector('[data-target="games"]')?.click();
+            // small delay to ensure Games DOM is ready
+            setTimeout(()=>{ try{ window.__aptStart && window.__aptStart(); }catch(_){} }, 200);
+          });
+
+          startFull?.addEventListener('click', ()=>{
+            document.querySelector('[data-target="games"]')?.click();
+          });
+        })();
+      </script>
     </section>
 
     <!-- ===== PERSONALITY ===== -->
