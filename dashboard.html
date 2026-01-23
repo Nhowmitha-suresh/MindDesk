@@ -109,19 +109,85 @@
         </div>
       </div>
 
-      <div class="cards" style="margin-top:12px">
-        <div class="card" style="flex:1;min-width:260px">
-          <h3 style="margin:0 0 8px 0">Aptitude Summary</h3>
-          <canvas id="aptPie" height="160"></canvas>
+      <div class="info-grid" style="margin-top:12px">
+        <div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Aptitude Overview</div>
+              <div class="chart-controls">
+                <div class="chart-toggle">
+                  <button class="active">Summary</button>
+                  <button>Topics</button>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+              <div class="apt-pie-wrapper" style="flex:0 0 auto">
+                <canvas id="aptPie" class="apt-pie"></canvas>
+              </div>
+              <div style="flex:1;min-width:220px">
+                <h4 style="margin:0 0 6px 0">Accuracy by Topic</h4>
+                <div class="chart-wrapper" style="height:180px;">
+                  <canvas id="aptRadar"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <h4 style="margin:0 0 8px 0">Aptitude — 3D Topics</h4>
+              <div id="apt3d" style="width:100%;height:240px;min-height:180px"></div>
+            </div>
+          </div>
         </div>
-        <div class="card" style="flex:1;min-width:260px">
-          <h3 style="margin:0 0 8px 0">Accuracy by Topic</h3>
-          <canvas id="aptRadar" height="160"></canvas>
-        </div>
-      </div>
-      <div class="card" style="margin-top:12px">
-        <h3 style="margin:0 0 8px 0">Aptitude — 3D Topics</h3>
-        <div id="apt3d" style="width:100%;height:320px;min-height:240px"></div>
+
+        <aside style="width:100%;max-width:360px">
+          <div class="info-card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <h4 style="margin:0">How this works</h4>
+                <p>Short practice sessions draw questions from topic banks, track accuracy and adapt difficulty.</p>
+              </div>
+              <div class="mascot-wrap">
+                <div class="mascot" id="mascot"> 
+                  <!-- simple friendly cat mascot (original SVG) -->
+                  <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="mgrad" x1="0" x2="1"><stop offset="0" stop-color="#ffd37a"/><stop offset="1" stop-color="#ffb36b"/></linearGradient>
+                    </defs>
+                    <g>
+                      <circle cx="32" cy="32" r="30" fill="url(#mgrad)" />
+                      <path d="M20 28 Q24 18 32 20 Q40 18 44 28 Q48 34 36 38 Q32 40 28 38 Q16 34 20 28" fill="#fff" opacity="0.95" />
+                      <circle cx="24" cy="28" r="4" fill="#1f2937" />
+                      <circle cx="40" cy="28" r="4" fill="#1f2937" />
+                      <path d="M28 36 Q32 40 36 36" stroke="#1f2937" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      <path d="M18 14 Q24 6 30 12" stroke="#1f2937" stroke-width="1.6" fill="none"/>
+                      <path d="M46 14 Q40 6 34 12" stroke="#1f2937" stroke-width="1.6" fill="none"/>
+                    </g>
+                  </svg>
+                </div>
+                <div class="bubble" id="mascotBubble">Hi! 🎉 Try a practice</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card" style="margin-top:12px">
+            <h4 style="margin:0">This is important</h4>
+            <p>Consistent short practice beats long rare sessions. Focus on accuracy first, then speed.</p>
+            <h4 style="margin-top:10px">How to solve</h4>
+            <ul>
+              <li>Read the question fully and eliminate wrong options.</li>
+              <li>Estimate roughly before calculating.</li>
+              <li>Skip and return if stuck — keep momentum.</li>
+            </ul>
+            <h4 style="margin-top:10px">How to improve</h4>
+            <ul>
+              <li>Do topic drills (5–10 minutes daily).</li>
+              <li>Review mistakes and note patterns.</li>
+              <li>Increase difficulty gradually.</li>
+            </ul>
+          </div>
+        </aside>
       </div>
     </section>
 

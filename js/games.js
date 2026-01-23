@@ -195,7 +195,9 @@
       }
       const pool = bank[topic] ? [...bank[topic]] : [];
       if (!pool.length){ elF().textContent='No questions in this topic yet.'; return; }
-      order = shuffle(pool).slice(0, 20);
+      // allow dynamic question count (set by About quick-practice or defaults)
+      const qcount = Number(localStorage.getItem('minddesk_apt_qcount')) || 20;
+      order = shuffle(pool).slice(0, Math.max(5, Math.min(60, qcount)));
       idx = 0; selection = -1;
       sessionCorrect = 0; sessionTotal = 0; updateBoard();
       document.getElementById('aptNext').disabled = true;
@@ -419,6 +421,20 @@
   window.__aptSubmit = () => { try { if (Aptitude && typeof Aptitude.submit==='function') Aptitude.submit(); } catch(e){ console.warn('Submit failed', e); } };
   window.__aptNext = () => { try { if (Aptitude && typeof Aptitude.next==='function') Aptitude.next(); } catch(e){ console.warn('Next failed', e); } };
 
+  // Helper to start practice programmatically: topic + difficulty ('easy'|'medium'|'hard')
+  window.startAptPractice = (topic, level) => {
+    try {
+      const map = { easy: 10, medium: 20, hard: 30 };
+      const qcount = map[level] || 20;
+      localStorage.setItem('minddesk_apt_qcount', String(qcount));
+      const sel = document.getElementById('aptTopic');
+      if (sel) sel.value = topic || sel.value || 'number_systems';
+      // ensure the Games section is visible
+      document.querySelector('[data-target="games"]')?.click();
+      setTimeout(()=>{ try { window.__aptStart && window.__aptStart(); } catch(_){} }, 180);
+    } catch(e){ console.warn('startAptPractice failed', e); }
+  };
+
   // Optional charts on Dashboard for Aptitude stats
   window.renderAptCharts = function(){
     try {
@@ -434,10 +450,32 @@
         const ctx = pie.getContext('2d');
         if (pie._chart) pie._chart.destroy();
         pie._chart = new Chart(ctx, {
-          type: 'pie',
+          type: 'doughnut',
           data: { labels: ['Correct','Incorrect'], datasets: [{ data: [correct.reduce((a,b)=>a+b,0), incorrect.reduce((a,b)=>a+b,0)], backgroundColor: ['#22c55e','#ef4444'] }] },
-          options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+          options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } }
         });
+        // small accessible center label
+        try{
+          const total = correct.reduce((a,b)=>a+b,0) + incorrect.reduce((a,b)=>a+b,0);
+          const correctSum = correct.reduce((a,b)=>a+b,0);
+          const pct = total ? Math.round(correctSum/total*100) : 0;
+          // place a small overlay text near the canvas
+          const wrap = pie.parentElement;
+          if (wrap && !wrap.querySelector('.apt-center')){
+            const c = document.createElement('div');
+            c.className='apt-center';
+            c.style.position='absolute';
+            c.style.left='12px';
+            c.style.top='12px';
+            c.style.pointerEvents='none';
+            c.style.fontSize='14px';
+            c.style.fontWeight='700';
+            c.style.color='var(--text)';
+            c.textContent = `${pct}% correct`;
+            wrap.style.position='relative';
+            wrap.appendChild(c);
+          }
+        }catch(_){ }
       }
       if (radar){
         const ctx = radar.getContext('2d');
@@ -900,6 +938,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   mountHUD();
 
+  // Mascot reactions (if present on dashboard)
+  (function wireMascot(){
+    const bubble = document.getElementById('mascotBubble');
+    const masc = document.getElementById('mascot');
+    if (!bubble || !masc) return;
+    let prevScore = GameCore.score;
+    let prevStreak = GameCore.streak;
+    const cheers = ["Nice! 🎉","Great job!","Keep it up!","Boom! +"+1];
+    const hurts = ["Oops — review that one","Try again!","You'll get the next one"];
+
+    GameCore.on(state=>{
+      const delta = state.score - prevScore;
+      if (delta > 0) {
+        const text = state.streak && state.streak % 3 === 0 ? `Streak ${state.streak}!` : `+${delta} points`;
+        bubble.textContent = cheers[Math.floor(Math.random()*cheers.length)].replace('+1', `+${delta}`) + ' ' + text;
+      } else if (delta < 0) {
+        bubble.textContent = hurts[Math.floor(Math.random()*hurts.length)];
+      }
+      if (state.streak !== prevStreak && state.streak > prevStreak) {
+        bubble.textContent = `Streak x${state.streak}! Keep going!`;
+      }
+      prevScore = state.score; prevStreak = state.streak;
+      // auto-clear after a few seconds
+      setTimeout(()=>{ try{ bubble.textContent = 'Hi! 🎉 Try a practice'; }catch(_){} }, 4200);
+    });
+
+    masc.addEventListener('click', ()=>{
+      bubble.textContent = ['You got this!','Try a quick 10-min drill','Focus on one topic today'][Math.floor(Math.random()*3)];
+    });
+  })();
+
   /* ============================================================
      GAME 1: REACTION TIME (VOICE ENABLED)
   ============================================================ */
@@ -1141,6 +1210,7 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(()=>{ el.style.opacity = '0.8'; }, 250);
     }
 
+    
     function addStep() {
       seq.push(Math.floor(Math.random()*4));
       renderIndicators();
