@@ -56,20 +56,6 @@ It provides visual insights via a modern dashboard and stores all data **locally
 - Copy data as **JSON**
 - Dynamic explanations and insights
 
----
-
-### 🎮 Psychometric Mini-Games
-Mini-games are designed to subtly capture behavioral tendencies in an engaging way:
-
-- Reaction Time
-- Memory Sequence
-- Quick Math
-- Suspicious Button
-- Random Pick
-- Annoying Situation
-- What Would You Do?
-
-Each game provides lightweight behavioral signals related to attention, impulse control, memory, and decision-making.
 
 ---
 
