@@ -9,11 +9,17 @@ It provides visual insights via a modern dashboard and stores all data **locally
 
 ## 📸 Screenshots
 
-<img width="1919" alt="Dashboard Overview" src="https://github.com/user-attachments/assets/076d87e5-da03-40c8-80f3-5648149d0d18" />
-<img width="1919" alt="Personality Test" src="https://github.com/user-attachments/assets/915a54ef-1616-4fa6-b96a-36c431acfc67" />
-<img width="1879" alt="Insights Panel" src="https://github.com/user-attachments/assets/6522c736-55ea-4a02-88c4-d49a1320f6f0" />
-<img width="1895" alt="Games Section" src="https://github.com/user-attachments/assets/da18772b-e836-4654-983d-546f5dad281f" />
-<img width="1919" alt="Themes & Appearance" src="https://github.com/user-attachments/assets/8657d4d5-df36-4d5d-9abb-e8b6ca55bed8" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/cddd00fc-bfa2-4bf3-935f-6dafc13b354c" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a5862a2d-32d3-4a58-b709-41453ea52a81" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/2d41307b-921b-478d-817e-1daab1c5c2c7" />
+<img width="1903" height="1079" alt="image" src="https://github.com/user-attachments/assets/be1fc129-0626-4c1e-b379-1294ef4044c8" />
+<img width="1918" height="1079" alt="image" src="https://github.com/user-attachments/assets/7f49bbe4-4627-44fb-b6e6-84f19d358887" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/648946e6-8c0e-497e-8045-4cc8aba499e8" />
+<img width="1918" height="1079" alt="image" src="https://github.com/user-attachments/assets/17808abd-d58c-401c-bac2-b86a948c0aa2" />
+<img width="1918" height="1079" alt="image" src="https://github.com/user-attachments/assets/b2ce599f-a050-4f79-85cf-4d98dd382176" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/5a0baf9e-790f-4306-a191-71721ca3af90" />
+
+
 
 ---
 
